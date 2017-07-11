@@ -1,0 +1,278 @@
+
+import java.io.Serializable;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.*;
+import javax.faces.context.FacesContext;
+
+@ManagedBean
+@SessionScoped
+public class TransactionTypeBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    private List<TransactionType> TransactionTypes;
+    private String ActionMessage;
+    private TransactionType SelectedTransactionType=null;
+    private int SelectedTransactionTypeId;
+    private String SearchTransactionTypeName="";
+    
+    public void saveTransactionType(TransactionType tt) {
+        String sql = null;
+        String msg=null;
+        UserDetail aCurrentUserDetail=new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights=new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb=new GroupRightBean();
+
+      if (tt.getTransactionTypeId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail,aCurrentGroupRights,"SETTING", "Add")==0) {
+            msg="YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+      }else if (tt.getTransactionTypeId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail,aCurrentGroupRights,"SETTING", "Edit")==0) {
+            msg="YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+      }else {
+        if (tt.getTransactionTypeId() == 0) {
+            sql = "{call sp_insert_transaction_type(?)}";
+        } else if (tt.getTransactionTypeId() > 0) {
+            sql = "{call sp_update_transaction_type(?,?)}";
+        }
+
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                CallableStatement cs = conn.prepareCall(sql);) {
+            if (tt.getTransactionTypeId() == 0) {
+                cs.setString(1, tt.getTransactionTypeName());
+                cs.executeUpdate();
+                this.setActionMessage("Saved Successfully");
+            } else if (tt.getTransactionTypeId() > 0) {
+                cs.setInt(1, tt.getTransactionTypeId());
+                cs.setString(2, tt.getTransactionTypeName());
+                cs.executeUpdate();
+                this.setActionMessage("Saved Successfully");
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+            this.setActionMessage("TransactionType NOT saved");
+        }
+      }
+    }
+
+    public TransactionType getTransactionType(int TtId) {
+        String sql = "SELECT * FROM transaction_type WHERE transaction_type_id=?";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, TtId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                TransactionType tt = new TransactionType();
+                tt.setTransactionTypeId(rs.getInt("transaction_type_id"));
+                tt.setTransactionTypeName(rs.getString("transaction_type_name"));  
+                return tt;
+            } else {
+                return null;
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+            return null;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+
+    }
+    
+    public void deleteTransactionType() {
+         this.deleteTransactionTypeById(this.SelectedTransactionTypeId);
+    }
+    public void deleteTransactionTypeByObject(TransactionType tt) {
+         this.deleteTransactionTypeById(tt.getTransactionTypeId());
+    }
+
+    public void deleteTransactionTypeById(int TtId) {
+        String sql = "DELETE FROM transaction_type WHERE transaction_type_id=?";
+        String msg;
+        UserDetail aCurrentUserDetail=new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights=new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb=new GroupRightBean();
+
+        if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail,aCurrentGroupRights,"SETTING", "Delete")==0) {
+            msg="YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+        }else
+        {
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, TtId);
+            ps.executeUpdate();
+            this.setActionMessage("Deleted Successfully!");
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+            this.setActionMessage("TransactionType NOT deleted");
+        }
+        }
+    }
+
+    public void displayTransactionType(TransactionType PmFrom, TransactionType PmTo) {
+        PmTo.setTransactionTypeId(PmFrom.getTransactionTypeId());
+        PmTo.setTransactionTypeName(PmFrom.getTransactionTypeName());
+    }
+
+    public void clearTransactionType(TransactionType Cat) {
+        Cat.setTransactionTypeId(0);
+        Cat.setTransactionTypeName("");
+    }
+
+    /**
+     * @return the TransactionTypes
+     */
+    public List<TransactionType> getTransactionTypes() {
+        String sql;
+        if(this.SearchTransactionTypeName.length()>0)
+        {
+            sql = "SELECT * FROM transaction_type WHERE transaction_type_name LIKE '%" + this.SearchTransactionTypeName + "%' ORDER BY transaction_type_name ASC";
+        }else
+        {
+            sql = "SELECT * FROM transaction_type ORDER BY transaction_type_name ASC";
+        }
+        ResultSet rs = null;
+        TransactionTypes = new ArrayList<TransactionType>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                TransactionType tt = new TransactionType();
+                tt.setTransactionTypeId(rs.getInt("transaction_type_id"));
+                tt.setTransactionTypeName(rs.getString("transaction_type_name"));
+                TransactionTypes.add(tt);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+        return TransactionTypes;
+    }
+    
+    public List<TransactionType> getTransTypesByTcTypeTransId(long aTransactionId,String aTransactorType) {
+        String sql;
+        int aTransactionTypeId=0;
+        List<TransactionType> tts;
+        Trans t;
+        
+        if(aTransactionId>0){
+            t=new TransBean().getTrans(aTransactionId);
+            aTransactionTypeId=t.getTransactionTypeId();
+        }else{
+            if(aTransactorType.equals("CUSTOMER") || aTransactorType.equals("SCHEME")){
+                aTransactionTypeId=2;//SALE
+            }else if(aTransactorType.equals("SUPPLIER")){
+                aTransactionTypeId=1;//SUPPLIER
+            }
+        }
+        sql = "SELECT * FROM transaction_type WHERE transaction_type_id=" + aTransactionTypeId;
+        ResultSet rs = null;
+        tts = new ArrayList<TransactionType>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                TransactionType tt = new TransactionType();
+                tt.setTransactionTypeId(rs.getInt("transaction_type_id"));
+                tt.setTransactionTypeName(rs.getString("transaction_type_name"));
+                tts.add(tt);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+        return tts;
+    }
+
+    /**
+     * @param TransactionTypes the TransactionTypes to set
+     */
+    public void setTransactionTypes(List<TransactionType> TransactionTypes) {
+        this.TransactionTypes = TransactionTypes;
+    }
+
+    /**
+     * @return the SelectedTransactionType
+     */
+    public TransactionType getSelectedTransactionType() {
+        return SelectedTransactionType;
+    }
+
+    /**
+     * @param SelectedTransactionType the SelectedTransactionType to set
+     */
+    public void setSelectedTransactionType(TransactionType SelectedTransactionType) {
+        this.SelectedTransactionType = SelectedTransactionType;
+    }
+
+    /**
+     * @return the SelectedTransactionTypeId
+     */
+    public int getSelectedTransactionTypeId() {
+        return SelectedTransactionTypeId;
+    }
+
+    /**
+     * @param SelectedTransactionTypeId the SelectedTransactionTypeId to set
+     */
+    public void setSelectedTransactionTypeId(int SelectedTransactionTypeId) {
+        this.SelectedTransactionTypeId = SelectedTransactionTypeId;
+    }
+
+    /**
+     * @return the SearchTransactionTypeName
+     */
+    public String getSearchTransactionTypeName() {
+        return SearchTransactionTypeName;
+    }
+
+    /**
+     * @param SearchTransactionTypeName the SearchTransactionTypeName to set
+     */
+    public void setSearchTransactionTypeName(String SearchTransactionTypeName) {
+        this.SearchTransactionTypeName = SearchTransactionTypeName;
+    }
+
+    /**
+     * @return the ActionMessage
+     */
+    public String getActionMessage() {
+        return ActionMessage;
+    }
+
+    /**
+     * @param ActionMessage the ActionMessage to set
+     */
+    public void setActionMessage(String ActionMessage) {
+        this.ActionMessage = ActionMessage;
+    }
+    
+}

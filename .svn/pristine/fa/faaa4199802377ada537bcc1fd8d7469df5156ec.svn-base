@@ -1,0 +1,246 @@
+
+import java.io.Serializable;
+import java.util.Date;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/**
+ *
+ * @author btwesigye
+ */
+@ManagedBean
+@SessionScoped
+public class Transactor implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private long TransactorId;
+    private String TransactorType;
+    private String TransactorNames;
+    private String Phone;
+    private String Email;
+    private String Website;
+    private String CpName;
+    private String CpTitle;
+    private String CpPhone;
+    private String CpEmail;
+    private String PhysicalAddress;
+    private String TaxIdentity;
+    private String AccountDetails;
+    private String CardNumber;
+    private Date DOB;
+
+    /**
+     * @return the TransactorId
+     */
+    public long getTransactorId() {
+        return TransactorId;
+    }
+
+    /**
+     * @param TransactorId the TransactorId to set
+     */
+    public void setTransactorId(long TransactorId) {
+        this.TransactorId = TransactorId;
+    }
+
+    /**
+     * @return the TransactorType
+     */
+    public String getTransactorType() {
+        return TransactorType;
+    }
+
+    /**
+     * @param TransactorType the TransactorType to set
+     */
+    public void setTransactorType(String TransactorType) {
+        this.TransactorType = TransactorType;
+    }
+
+    /**
+     * @return the TransactorNames
+     */
+    public String getTransactorNames() {
+        return TransactorNames;
+    }
+
+    /**
+     * @param TransactorNames the TransactorNames to set
+     */
+    public void setTransactorNames(String TransactorNames) {
+        this.TransactorNames = TransactorNames;
+    }
+
+    /**
+     * @return the Phone
+     */
+    public String getPhone() {
+        return Phone;
+    }
+
+    /**
+     * @param Phone the Phone to set
+     */
+    public void setPhone(String Phone) {
+        this.Phone = Phone;
+    }
+
+    /**
+     * @return the Email
+     */
+    public String getEmail() {
+        return Email;
+    }
+
+    /**
+     * @param Email the Email to set
+     */
+    public void setEmail(String Email) {
+        this.Email = Email;
+    }
+
+    /**
+     * @return the Website
+     */
+    public String getWebsite() {
+        return Website;
+    }
+
+    /**
+     * @param Website the Website to set
+     */
+    public void setWebsite(String Website) {
+        this.Website = Website;
+    }
+
+    /**
+     * @return the CpName
+     */
+    public String getCpName() {
+        return CpName;
+    }
+
+    /**
+     * @param CpName the CpName to set
+     */
+    public void setCpName(String CpName) {
+        this.CpName = CpName;
+    }
+
+    /**
+     * @return the CpTitle
+     */
+    public String getCpTitle() {
+        return CpTitle;
+    }
+
+    /**
+     * @param CpTitle the CpTitle to set
+     */
+    public void setCpTitle(String CpTitle) {
+        this.CpTitle = CpTitle;
+    }
+
+    /**
+     * @return the CpPhone
+     */
+    public String getCpPhone() {
+        return CpPhone;
+    }
+
+    /**
+     * @param CpPhone the CpPhone to set
+     */
+    public void setCpPhone(String CpPhone) {
+        this.CpPhone = CpPhone;
+    }
+
+    /**
+     * @return the CpEmail
+     */
+    public String getCpEmail() {
+        return CpEmail;
+    }
+
+    /**
+     * @param CpEmail the CpEmail to set
+     */
+    public void setCpEmail(String CpEmail) {
+        this.CpEmail = CpEmail;
+    }
+
+    /**
+     * @return the PhysicalAddress
+     */
+    public String getPhysicalAddress() {
+        return PhysicalAddress;
+    }
+
+    /**
+     * @param PhysicalAddress the PhysicalAddress to set
+     */
+    public void setPhysicalAddress(String PhysicalAddress) {
+        this.PhysicalAddress = PhysicalAddress;
+    }
+
+    /**
+     * @return the TaxIdentity
+     */
+    public String getTaxIdentity() {
+        return TaxIdentity;
+    }
+
+    /**
+     * @param TaxIdentity the TaxIdentity to set
+     */
+    public void setTaxIdentity(String TaxIdentity) {
+        this.TaxIdentity = TaxIdentity;
+    }
+
+    /**
+     * @return the AccountDetails
+     */
+    public String getAccountDetails() {
+        return AccountDetails;
+    }
+
+    /**
+     * @param AccountDetails the AccountDetails to set
+     */
+    public void setAccountDetails(String AccountDetails) {
+        this.AccountDetails = AccountDetails;
+    }
+
+    /**
+     * @return the CardNumber
+     */
+    public String getCardNumber() {
+        return CardNumber;
+    }
+
+    /**
+     * @param CardNumber the CardNumber to set
+     */
+    public void setCardNumber(String CardNumber) {
+        this.CardNumber = CardNumber;
+    }
+
+    /**
+     * @return the DOB
+     */
+    public Date getDOB() {
+        return DOB;
+    }
+
+    /**
+     * @param DOB the DOB to set
+     */
+    public void setDOB(Date DOB) {
+        this.DOB = DOB;
+    }
+   
+}
