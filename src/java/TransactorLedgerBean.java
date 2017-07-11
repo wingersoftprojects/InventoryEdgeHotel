@@ -345,6 +345,7 @@ public class TransactorLedgerBean implements Serializable {
     }
 
     public List<TransactorLedger> getReportTransactorLedger(TransactorLedger aTransactorLedger) {
+        //Test
         String sql;
         sql = "{call sp_report_transactor_ledger_detail(?,?,?,?,?,?,?)}";
         ResultSet rs = null;
