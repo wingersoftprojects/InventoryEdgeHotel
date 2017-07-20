@@ -38,7 +38,17 @@
                 <h:outputLabel style="background-color:black;color: lightsalmon;" value="Stock:Decreases"/>
                 <h:outputLabel style="background-color:black;color:lightsalmon;" value="Ledger:Debts sale,Credits payment"/>
             </h:panelGrid>
-
+            <h:panelGrid styleClass="clsGridMainMessages" columns="1" style="margin-left: 1110px; padding: 5px; position: fixed; background: #c2dfef;">
+                <p:commandButton id="newfolio" value="New Folio" process="@this" update=":guestfolioform" oncomplete="PF('GuestFolioDialog').show();" rendered="#{transBean.isCreateFolio(generalUserSetting.getCurrentUser(),generalUserSetting.getCurrentGroupRights())}">
+                </p:commandButton>
+                <br/>
+                <h:panelGrid columns="2" style="width: 100% !important;">
+                    <ui:include src="GuestFolioSummaryReport.xhtml"/>   
+                </h:panelGrid>
+                <br/>
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
             <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
                 <h:outputLabel styleClass="clsLabel" value="Trans.Reason:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuTransactionReason" value="#{trans.transactionReasonId}">
@@ -96,7 +106,7 @@
                 </p:outputPanel>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 170px" value="PAX"/>
                 <h:inputText styleClass="clsInput" value="#{trans.numberOfPersons}" size="10">
-                <f:ajax execute="@this" event="blur"/>
+                    <f:ajax execute="@this" event="blur"/>
                 </h:inputText>
                 <h:outputLabel styleClass="clsLabel" value="#{transactionTypeBean.getTransactionType(2).transactorLabel}:"/>
                 <p:outputPanel>
@@ -119,16 +129,18 @@
                         </p:column> 
                         <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}"/>
                         <p:ajax event="change" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null}"/>
-                        <p:ajax event="blur" update="olblDebtCredit itxtDebtCredit"/>
+                        <p:ajax event="blur" update="olblDebtCredit itxtDebtCredit tblGuestFolioSummary"/>
                     </p:autoComplete>
                     <p:commandButton id="newtransactor" value="New" process="@this" update=":transactorform" oncomplete="PF('TransactorDialog').show();">
                     </p:commandButton>
                     <p:tooltip for="autcTransactor" value="Please enter the Guest you are selling the room to!"/>
                 </p:outputPanel>
                 <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" styleClass="clsLabel" value="#{transactorLedgerBean.getCurrentTransactorLedgerByIndividual(trans.transactorId).netDebtCreditLabel}:"/>
-                <h:inputText disabled="true" style="color: coral;font-weight: bold;" styleClass="clsInput" id="itxtDebtCredit" value="#{transactorLedgerBean.getCurrentTransactorLedgerByIndividual(trans.transactorId).netDebtCreditAmount}" size="13">
-                    <f:convertNumber pattern="###,###.##"/>
-                </h:inputText>
+                <p:outputPanel>
+                    <h:inputText disabled="true" style="color: coral;font-weight: bold;" styleClass="clsInput" id="itxtDebtCredit" value="#{transactorLedgerBean.getCurrentTransactorLedgerByIndividual(trans.transactorId).netDebtCreditAmount}" size="13">
+                        <f:convertNumber pattern="###,###.##"/>
+                    </h:inputText>
+                </p:outputPanel>
                 <h:outputLabel styleClass="clsLabel" value="Currency Type:"/>
                 <h:selectOneMenu styleClass="clsMenu" value="#{trans.currencyTypeId}">
                     <f:selectItems value="#{currencyTypeBean.currencyTypes}" var="ct" itemLabel="#{ct.currencyTypeName}" itemValue="#{ct.currencyTypeId}"/>
@@ -378,7 +390,7 @@
                         </p:column> 
                         <p:ajax event="itemSelect" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}"/>
                         <p:ajax event="change" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}" rendered="#{transactorBean.selectedBillTransactor!=null}"/>
-                        <p:ajax event="blur" update="olblDebtCredit2 itxtDebtCredit2"/>
+                        <p:ajax event="blur" update="olblDebtCredit2 itxtDebtCredit2 tblGuestFolioSummary"/>
                     </p:autoComplete>
                     <h:outputLabel id="olblDebtCredit2" style="color: coral;font-weight: bold;" styleClass="clsLabel" value="#{transactorLedgerBean.getCurrentTransactorLedgerByIndividual(trans.billTransactorId).netDebtCreditLabel}:"/>
                     <h:inputText disabled="true" style="color: coral;font-weight: bold;" styleClass="clsInput" id="itxtDebtCredit2" value="#{transactorLedgerBean.getCurrentTransactorLedgerByIndividual(trans.billTransactorId).netDebtCreditAmount}">
@@ -502,10 +514,10 @@
                 </h:panelGrid>
             </h:panelGrid>
 
-            <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+            <!--<h:panelGrid styleClass="clsGridMainMessages" columns="1">
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
                 <h:messages id="msgsMainMessage" style="color: red"/><br/>
-            </h:panelGrid>
+            </h:panelGrid>-->
 
             <!-- INVOICE STARTS HERE -->
             <ui:include src="#{transBean.getPrintoutJsfFile(2, transBean.overridePrintVersion)}"/>
@@ -513,6 +525,7 @@
 
         </h:form>
         <ui:include src="transactordialog.xhtml"/>
+        <ui:include src="guestfoliodialog.xhtml"/>
     </h:body>
 </html>
 

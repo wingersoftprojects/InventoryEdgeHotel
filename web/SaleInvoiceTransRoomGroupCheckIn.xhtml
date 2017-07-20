@@ -39,7 +39,17 @@
                 <h:outputLabel style="background-color:black;color: lightsalmon;" value="Stock:Decreases"/>
                 <h:outputLabel style="background-color:black;color:lightsalmon;" value="Ledger:Debts sale,Credits payment"/>
             </h:panelGrid>
-
+            <h:panelGrid styleClass="clsGridMainMessages" columns="1" style="margin-left: 1110px; padding: 5px; position: fixed; background: #c2dfef;">
+                <p:commandButton id="newfolio" value="New Folio" process="@this" update=":guestfolioform" oncomplete="PF('GuestFolioDialog').show();" rendered="#{transBean.isCreateFolio(generalUserSetting.getCurrentUser(),generalUserSetting.getCurrentGroupRights())}">
+                </p:commandButton>
+                <br/>
+                <h:panelGrid columns="2" style="width: 100% !important;">
+                    <ui:include src="GuestFolioSummaryReport.xhtml"/>   
+                </h:panelGrid>
+                <br/>
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
             <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
                 <h:outputLabel styleClass="clsLabel" value="Trans.Reason:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuTransactionReason" value="#{trans.transactionReasonId}">
@@ -65,10 +75,6 @@
                 <h:inputText styleClass="clsInput" value="#{trans.numberOfPersons}" size="10">
                     <f:ajax execute="numberOfPersons" listener="#{trans.set_room_occupancy_list()}" event="blur" render="@this pgrdGuestList itxtQty itxtAmount"/>
                 </h:inputText>
-                <h:outputLabel styleClass="clsLabel" value="Currency Type:"/>
-                <h:selectOneMenu styleClass="clsMenu" value="#{trans.currencyTypeId}">
-                    <f:selectItems value="#{currencyTypeBean.currencyTypes}" var="ct" itemLabel="#{ct.currencyTypeName}" itemValue="#{ct.currencyTypeId}"/>
-                </h:selectOneMenu>
                 <h:outputLabel styleClass="clsLabel" value="#{transactionTypeBean.getTransactionType(2).billTransactorLabel}:"/>
                 <p:outputPanel>
                     <p:autoComplete id="autcBillTransactor" value="#{transactorBean.selectedBillTransactor}" 
@@ -90,7 +96,7 @@
                         </p:column> 
                         <p:ajax event="itemSelect" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}"/>
                         <p:ajax event="change" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}" rendered="#{transactorBean.selectedBillTransactor!=null}"/>
-                        <p:ajax event="blur" update="olblDebtCredit2 itxtDebtCredit2"/>
+                        <p:ajax event="blur" update="olblDebtCredit2 itxtDebtCredit2 tblGuestFolioSummary"/>
                     </p:autoComplete>
                     <p:commandButton id="newtransactor2" value="New" process="@this" update=":transactorform" oncomplete="PF('TransactorDialog').show();">
                     </p:commandButton>
@@ -99,7 +105,13 @@
                 <h:inputText disabled="true" size="13" style="color: coral;font-weight: bold;" styleClass="clsInput" id="itxtDebtCredit2" value="#{transactorLedgerBean.getCurrentTransactorLedgerByIndividual(trans.billTransactorId).netDebtCreditAmount}">
                     <f:convertNumber pattern="###,###.##"/>
                 </h:inputText>
+                <h:outputLabel styleClass="clsLabel" value="Currency Type:"/>
+                <h:selectOneMenu styleClass="clsMenu" value="#{trans.currencyTypeId}">
+                    <f:selectItems value="#{currencyTypeBean.currencyTypes}" var="ct" itemLabel="#{ct.currencyTypeName}" itemValue="#{ct.currencyTypeId}"/>
+                </h:selectOneMenu>
+
             </h:panelGrid>
+            <br/>
             <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="8">
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 250px" value="Room Description"/>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 50px" value="Unit"/>
@@ -499,10 +511,10 @@
                 </h:panelGrid>
             </h:panelGrid>
 
-            <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+            <!--<h:panelGrid styleClass="clsGridMainMessages" columns="1">
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
                 <h:messages id="msgsMainMessage" style="color: red"/><br/>
-            </h:panelGrid>
+            </h:panelGrid>-->
 
             <!-- INVOICE STARTS HERE -->
             <ui:include src="#{transBean.getPrintoutJsfFile(2, transBean.overridePrintVersion)}"/>

@@ -50,7 +50,13 @@
                             <p:separator />
                         </p:submenu>
                         <p:separator />
-                        <p:menuitem id="mnuid_saleFolio" value="Folio" action="#{navigationBean.redirectToReportTransactorLedger_Grand()}" />
+                        <p:submenu label="Folio">  
+                            <p:separator />
+                            <p:menuitem id="mnuid_saleFolio" value="Print Folio" action="#{navigationBean.redirectToReportTransactorLedger_Grand()}" />
+                            <p:separator />
+                            <p:menuitem id="mnuid_saleCreateFolio" value="Create/Edit Folio" action="#{navigationBean.redirectToGuestFolio()}" />
+                            <p:separator />
+                        </p:submenu>
                         <p:separator />
                     </p:submenu>
                     <p:separator /> 
@@ -101,7 +107,7 @@
                     <p:separator />
                     <p:menuitem value="Item Details" action="#{navigationBean.redirectToItem()}" /> 
                     <p:separator />
-                                        <p:menuitem value="Room Category" action="#{navigationBean.redirectToRoomCategory()}" /> 
+                    <p:menuitem value="Room Category" action="#{navigationBean.redirectToRoomCategory()}" /> 
                     <p:separator />
                     <p:menuitem value="Rooms" action="#{navigationBean.redirectToRoom()}" /> 
                     <p:separator />
@@ -139,7 +145,7 @@
                     <p:separator />
                     <p:menuitem value="Payment Methods" action="#{navigationBean.redirectToPayMethod()}" />   
                     <p:separator />
-<p:menuitem value="Currency Type" action="#{navigationBean.redirectToCurrencyType()}" /> 
+                    <p:menuitem value="Currency Type" action="#{navigationBean.redirectToCurrencyType()}" /> 
                     <p:separator />
                     <p:submenu label="Users and Groups">  
                         <p:separator />

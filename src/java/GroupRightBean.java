@@ -692,6 +692,7 @@ public class GroupRightBean implements Serializable {
         FunctionArrayList[24] = "REPORT-TRANSACTIONS";
         FunctionArrayList[25] = "REPORT-PAYMENTS";
         FunctionArrayList[26] = "REPORT-ROOMINGLIST";
+        FunctionArrayList[27] = "GUESTFOLIO";
         return FunctionArrayList;
     }
 

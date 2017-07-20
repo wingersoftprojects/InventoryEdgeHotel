@@ -38,7 +38,17 @@
                 <h:outputLabel style="background-color:black;color: lightsalmon;" value="Stock:Decreases"/>
                 <h:outputLabel style="background-color:black;color:lightsalmon;" value="Ledger:Debts sale,Credits payment"/>
             </h:panelGrid>
-
+            <h:panelGrid styleClass="clsGridMainMessages" columns="1" style="margin-left: 1110px; padding: 5px; position: fixed; background: #c2dfef;">
+                <p:commandButton id="newfolio" value="New Folio" process="@this" update=":guestfolioform" oncomplete="PF('GuestFolioDialog').show();" rendered="#{transBean.isCreateFolio(generalUserSetting.getCurrentUser(),generalUserSetting.getCurrentGroupRights())}">
+                </p:commandButton>
+                <br/>
+                <h:panelGrid columns="2" style="width: 100% !important;">
+                    <ui:include src="GuestFolioSummaryReport.xhtml"/>   
+                </h:panelGrid>
+                                <br/>
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
             <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
                 <h:outputLabel styleClass="clsLabel" value="Trans.Reason:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuTransactionReason" value="#{trans.transactionReasonId}">
@@ -54,7 +64,6 @@
                 <h:outputLabel styleClass="clsLabel" value="#{transactionTypeBean.getTransactionType(2).transactionRefLabel}:"/>
                 <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{trans.transactionRef}" autocomplete="off">
                 </h:inputText>
-
                 <h:outputLabel styleClass="clsLabel" value="#{transactionTypeBean.getTransactionType(2).transactorLabel}:"/>
                 <p:outputPanel>
                     <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
@@ -76,7 +85,7 @@
                         </p:column> 
                         <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}"/>
                         <p:ajax event="change" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null}"/>
-                        <p:ajax event="blur" update="olblDebtCredit itxtDebtCredit"/>
+                        <p:ajax event="blur" update="olblDebtCredit itxtDebtCredit tblGuestFolioSummary"/>
                     </p:autoComplete>
                     <p:commandButton id="newtransactor" value="New" process="@this" update=":transactorform" oncomplete="PF('TransactorDialog').show();">
                     </p:commandButton>
@@ -367,7 +376,7 @@
                         </p:column> 
                         <p:ajax event="itemSelect" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}"/>
                         <p:ajax event="change" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}" rendered="#{transactorBean.selectedBillTransactor!=null}"/>
-                        <p:ajax event="blur" update="olblDebtCredit2 itxtDebtCredit2"/>
+                        <p:ajax event="blur" update="olblDebtCredit2 itxtDebtCredit2 tblGuestFolioSummary"/>
                     </p:autoComplete>
                     <h:outputLabel id="olblDebtCredit2" style="color: coral;font-weight: bold;" styleClass="clsLabel" value="#{transactorLedgerBean.getCurrentTransactorLedgerByIndividual(trans.billTransactorId).netDebtCreditLabel}:"/>
                     <h:inputText disabled="true" style="color: coral;font-weight: bold;" styleClass="clsInput" id="itxtDebtCredit2" value="#{transactorLedgerBean.getCurrentTransactorLedgerByIndividual(trans.billTransactorId).netDebtCreditAmount}">
@@ -471,8 +480,8 @@
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="5">
                     <h:selectBooleanCheckbox value="#{transBean.autoPrintAfterSave}"/>
                     <h:outputLabel value="Print.After.Save" style="color: white"/>
-                    <h:commandButton styleClass="clsButtonBig" id="cmdbSave" value="SAVE (ALT+S)" accesskey="s">
-                        <f:ajax listener="#{transBean.saveTrans(trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,null)}" execute="@form" render="@form"/>
+                    <h:commandButton styleClass="clsButtonBig" id="cmdbSave" value="SAVE (ALT+S)" accesskey="s" actionListener="#{transBean.setIssaleroom(false)}"  action="#{transBean.saveTrans(trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,null)}">
+                        <f:ajax execute="@form" render="@form"/>
                         <f:setPropertyActionListener target="#{transBean.is_group_check_in}" value="#{false}"/>
                     </h:commandButton>
                     <h:commandButton id="cmdbClear" styleClass="clsButtonBig" value="CLEAR (ALT+C)" accesskey="c">
@@ -491,17 +500,13 @@
                 </h:panelGrid>
             </h:panelGrid>
 
-            <h:panelGrid styleClass="clsGridMainMessages" columns="1">
-                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
-                <h:messages id="msgsMainMessage" style="color: red"/><br/>
-            </h:panelGrid>
-
             <!-- INVOICE STARTS HERE -->
             <ui:include src="#{transBean.getPrintoutJsfFile(2, transBean.overridePrintVersion)}"/>
             <!-- INVOICE ENDS HERE -->
 
         </h:form>
         <ui:include src="transactordialog.xhtml"/>
+        <ui:include src="guestfoliodialog.xhtml"/>
     </h:body>
 </html>
 

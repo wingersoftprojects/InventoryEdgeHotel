@@ -59,6 +59,7 @@
                     <h:panelGrid styleClass="clsGridMainInput" columns="2" rendered="#{payBean.searchBy.equals('Name')}">
                         <h:outputLabel styleClass="clsLabel" value="#{transactionTypeBean.getTransactionType(2).transactorLabel}:" rendered="#{generalUserSetting.getCurrentPayCategory().equals('IN')}"/>
                         <h:outputLabel styleClass="clsLabel" value="#{transactionTypeBean.getTransactionType(1).transactorLabel}:" rendered="#{generalUserSetting.getCurrentPayCategory().equals('OUT')}"/>
+                        <p:outputPanel>
                         <p:autoComplete id="autcTransactor" value="#{payBean.selectedBillTransactor}" 
                                         completeMethod="#{transactorBean.getTransactorObjectList}" 
                                         var="trct" 
@@ -79,8 +80,11 @@
                             </p:column> 
                             <p:ajax event="itemSelect" listener="#{pay.setBillTransactorId(payBean.selectedBillTransactor.transactorId)}" update="pnlTransType,buttons,dtblPay" />
                             <p:ajax event="change" listener="#{pay.setBillTransactorId(payBean.selectedBillTransactor.transactorId)}" rendered="#{payBean.selectedBillTransactor!=null}" update="pnlTransType,buttons,dtblPay" />
-                        </p:autoComplete>
-                    </h:panelGrid>
+                        </p:autoComplete>    
+                            <p:commandButton id="newfolio" value="New Folio" process="@this" update=":guestfolioform" oncomplete="PF('GuestFolioDialog').show();">
+                    </p:commandButton>
+                        </p:outputPanel>
+                                            </h:panelGrid>
                     <h:panelGrid styleClass="clsGridMainInput" columns="2" rendered="#{payBean.searchBy.equals('InvoiceNo')}">
                         <h:outputLabel styleClass="clsLabel" value="#{transactionTypeBean.getTransactionType(2).transactionNumberLabel}:" rendered="#{generalUserSetting.getCurrentPayCategory().equals('IN')}"/>
                         <h:outputLabel styleClass="clsLabel" value="#{transactionTypeBean.getTransactionType(1).transactionNumberLabel}:" rendered="#{generalUserSetting.getCurrentPayCategory().equals('OUT')}"/>
@@ -274,6 +278,7 @@
             <ui:include id="uiPayReceipt" src="PayReceipt.xhtml"/>
             <!-- RECEIPT/VOUCHER ENDS HERE -->
         </h:form>
+        <ui:include src="guestfoliodialog.xhtml"/>
     </h:body>
 </html>
 

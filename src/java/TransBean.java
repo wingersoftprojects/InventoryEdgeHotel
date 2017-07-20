@@ -3142,6 +3142,14 @@ public class TransBean implements Serializable {
             return true;
         }
     }
+    public boolean isCreateFolio(UserDetail aUserDetail, List<GroupRight> aGroupRights) {
+        GroupRightBean grb = new GroupRightBean();
+        if (grb.IsUserGroupsFunctionAccessAllowed(aUserDetail, aGroupRights, "GUESTFOLIO", "Edit") == 1 && grb.IsUserGroupsFunctionAccessAllowed(aUserDetail, aGroupRights, "GUESTFOLIO", "Add") == 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public void setDateToToday(Trans aTrans) {
         Date CurrentServerDate = CompanySetting.getCURRENT_SERVER_DATE();

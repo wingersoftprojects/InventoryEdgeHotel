@@ -574,6 +574,18 @@ public class NavigationBean implements Serializable {
         return "TransactionType?faces-redirect=true";
     }
 
+    public String redirectToGuestFolio() {
+        //update seesion
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(false);
+        httpSession.setAttribute("TRANSACTOR_TYPE", "CUSTOMER");
+        httpSession.setAttribute("TRANSACTION_TYPE_ID", 0);
+        httpSession.setAttribute("TRANSACTION_TYPE_NAME", "GUESTFOLIO");
+        httpSession.setAttribute("INVOKE_MODE", "PARENT");
+        return "GuestFolio?faces-redirect=true";
+    }
+    
     public String redirectToTransactorCustomer() {
         //update seesion
         FacesContext context = FacesContext.getCurrentInstance();
@@ -753,6 +765,8 @@ public class NavigationBean implements Serializable {
             }
         } else if ("TRANSACTOR".equals(aFunctionName)) {
             RealFunctionName = "TRANSACTOR";
+        } else if ("GUESTFOLIO".equals(aFunctionName)) {
+            RealFunctionName = "GUESTFOLIO";
         } else {
             RealFunctionName = aFunctionName;
         }

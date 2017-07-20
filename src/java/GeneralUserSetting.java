@@ -177,6 +177,18 @@ public class GeneralUserSetting implements Serializable {
         }
         return StrResponse;
     }
+    public String getCurrentGuestFolioType() {
+        String StrResponse;
+        try {
+            FacesContext context = FacesContext.getCurrentInstance();
+            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+            HttpSession httpSession = request.getSession(false);
+            StrResponse = (String) httpSession.getAttribute("TRANSACTOR_TYPE");
+        } catch (NullPointerException npe) {
+            StrResponse = "";
+        }
+        return StrResponse;
+    }
     
     public String getCurrentInvokeMode() {
         String StrResponse;
