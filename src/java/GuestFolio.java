@@ -29,6 +29,24 @@ public class GuestFolio implements Serializable {
 
     private long total_amount_credit;
     private long total_amount_debit;
+    private Integer adults;
+    private Integer children;
+
+    public Integer getAdults() {
+        return adults;
+    }
+
+    public void setAdults(Integer adults) {
+        this.adults = adults;
+    }
+
+    public Integer getChildren() {
+        return children;
+    }
+
+    public void setChildren(Integer children) {
+        this.children = children;
+    }
 
     public long getTotal_amount_credit() {
         return total_amount_credit;
@@ -118,6 +136,8 @@ public class GuestFolio implements Serializable {
             guest_folio.setStatus("");
             guest_folio.setStartDate(null);
             guest_folio.setEndDate(null);
+            guest_folio.setChildren(0);
+            guest_folio.setAdults(0);
         }
     }
 }

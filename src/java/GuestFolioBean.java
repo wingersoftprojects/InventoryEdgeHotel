@@ -24,7 +24,7 @@ import javax.faces.context.FacesContext;
 @ManagedBean
 @SessionScoped
 public class GuestFolioBean implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
     private List<GuestFolio> GuestFolios;
     private String ActionMessage = null;
@@ -34,25 +34,25 @@ public class GuestFolioBean implements Serializable {
     private GuestFolio SelectedSchemeGuestFolio;
     private List<GuestFolio> GuestFolioObjectList;
     private List<GuestFolio> ReportGuestFolios = new ArrayList<>();
-
+    
     List<GuestFolio> ReportGuestFolioSummary = new ArrayList<>();
-
+    
     public List<GuestFolio> getReportGuestFolios() {
         return ReportGuestFolios;
     }
-
+    
     public void setReportGuestFolios(List<GuestFolio> ReportGuestFolios) {
         this.ReportGuestFolios = ReportGuestFolios;
     }
-
+    
     public List<GuestFolio> getReportGuestFolioSummary() {
         return ReportGuestFolioSummary;
     }
-
+    
     public void setReportGuestFolioSummary(List<GuestFolio> ReportGuestFolioSummary) {
         this.ReportGuestFolioSummary = ReportGuestFolioSummary;
     }
-
+    
     public GuestFolio findGuestFolio(Long GuestFolioId) {
         String sql = "{call sp_search_guest_folio_by_id(?)}";
         ResultSet rs = null;
@@ -79,7 +79,7 @@ public class GuestFolioBean implements Serializable {
             }
         }
     }
-
+    
     public void saveGuestFolio(GuestFolio guest_folio) {
         String sql = null;
         String msg = "";
@@ -92,7 +92,7 @@ public class GuestFolioBean implements Serializable {
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
-
+        
         if (guest_folio.getTransactor() == null) {
             msg = "GUEST/COMPANY NOT SELECTED";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
@@ -112,11 +112,11 @@ public class GuestFolioBean implements Serializable {
             msg = "An active Guest Folio for (" + guest_folio.getTransactor().getTransactorNames() + ") already exists!";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else {
-
+            
             if (guest_folio.getGuestFolioId() == 0) {
-                sql = "{call sp_insert_guest_folio(?,?,?,?)}";
+                sql = "{call sp_insert_guest_folio(?,?,?,?,?,?)}";
             } else if (guest_folio.getGuestFolioId() > 0) {
-                sql = "{call sp_update_guest_folio(?,?,?,?,?,?,?)}";
+                sql = "{call sp_update_guest_folio(?,?,?,?,?,?,?,?,?)}";
             }
             try (
                     Connection conn = DBConnection.getMySQLConnection();
@@ -135,11 +135,22 @@ public class GuestFolioBean implements Serializable {
                     } catch (NullPointerException npe) {
                         cs.setDate("in_end_date", null);
                     }
+                    try {
+                        cs.setInt("in_children", guest_folio.getChildren());
+                    } catch (NullPointerException npe) {
+                        cs.setDate("in_children", null);
+                    }
+                    try {
+                        cs.setInt("in_adults", guest_folio.getAdults());
+                    } catch (NullPointerException npe) {
+                        cs.setDate("in_adults", null);
+                    }
+                    
                     cs.setInt("in_add_user_detail_id", new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     cs.executeUpdate();
                     this.setActionMessage("Saved Successfully");
                     this.clearGuestFolio(guest_folio);
-
+                    
                 } else if (guest_folio.getGuestFolioId() > 0) {
                     //IN in_guest_folio_id bigint,IN in_is_current varchar(1),IN in_status varchar(20) ,IN in_transactor_id bigint,IN in_start_date date,IN in_end_date date,IN in_edit_user_detail_id int
                     cs.setLong("in_guest_folio_id", guest_folio.getGuestFolioId());
@@ -156,6 +167,18 @@ public class GuestFolioBean implements Serializable {
                     } catch (NullPointerException npe) {
                         cs.setDate("in_end_date", null);
                     }
+                    
+                    try {
+                        cs.setInt("in_children", guest_folio.getChildren());
+                    } catch (NullPointerException npe) {
+                        cs.setDate("in_children", null);
+                    }
+                    try {
+                        cs.setInt("in_adults", guest_folio.getAdults());
+                    } catch (NullPointerException npe) {
+                        cs.setDate("in_adults", null);
+                    }
+                    
                     cs.setInt("in_edit_user_detail_id", new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     cs.executeUpdate();
                     this.setActionMessage("Saved Successfully");
@@ -168,7 +191,7 @@ public class GuestFolioBean implements Serializable {
             }
         }
     }
-
+    
     public GuestFolio getGuestFolioFromResultSet(ResultSet rs) {
         GuestFolio guest_folio = new GuestFolio();
         try {
@@ -211,9 +234,39 @@ public class GuestFolioBean implements Serializable {
         } catch (Exception ex) {
             guest_folio.setTotal_amount_debit(0);
         }
+        try {
+            guest_folio.setChildren(rs.getInt("children"));
+        } catch (Exception ex) {
+            guest_folio.setChildren(0);
+        }
+        try {
+            guest_folio.setAdults(rs.getInt("adults"));
+        } catch (Exception ex) {
+            guest_folio.setAdults(0);
+        }
         return guest_folio;
     }
+    
+    private GuestFolio guestFolio;
 
+    public GuestFolio getGuestFolio() {
+        return guestFolio;
+    }
+    
+    public void setGuestFolio(GuestFolio guestFolio) {
+        this.guestFolio = guestFolio;
+    }
+
+    public void set_guest_folio(long GuestFolioId) {
+        this.guestFolio = getGuestFolio(GuestFolioId);
+    }
+    
+    public void set_guest_folio_null(){
+        GuestFolio gf=new GuestFolio();
+        gf.setGuestFolioId(0);
+        this.guestFolio=gf;
+    }
+    
     public GuestFolio getGuestFolio(long GuestFolioId) {
         String sql = "{call sp_search_guest_folio_by_id(?)}";
         ResultSet rs = null;
@@ -239,21 +292,21 @@ public class GuestFolioBean implements Serializable {
                 }
             }
         }
-
+        
     }
-
+    
     public void deleteGuestFolio(GuestFolio guest_folio) {
         String sql = "DELETE FROM guest_folio WHERE guest_folio_id=?";
         String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
-
+        
         if ("GUESTFOLIO".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "CUSTOMER", "Delete") == 0) {
             msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else {
-
+            
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -267,7 +320,7 @@ public class GuestFolioBean implements Serializable {
             }
         }
     }
-
+    
     public void displayGuestFolio(GuestFolio GuestFolioFrom, GuestFolio GuestFolioTo) {
         GuestFolioTo.setGuestFolioId(GuestFolioFrom.getGuestFolioId());
         GuestFolioTo.setTransactorId(GuestFolioFrom.getTransactorId());
@@ -276,7 +329,7 @@ public class GuestFolioBean implements Serializable {
         GuestFolioTo.setIsCurrent(GuestFolioFrom.getIsCurrent());
         GuestFolioTo.setStatus(GuestFolioFrom.getStatus());
     }
-
+    
     public void closeGuestFolio(GuestFolio GuestFolioFrom, GuestFolio GuestFolioTo) {
 //        GuestFolioTo.setGuestFolioId(GuestFolioFrom.getGuestFolioId());
 //        GuestFolioTo.setTransactorId(GuestFolioFrom.getTransactorId());
@@ -286,7 +339,7 @@ public class GuestFolioBean implements Serializable {
 //        GuestFolioTo.setStatus(GuestFolioFrom.getStatus());
 
         String sql = "{call sp_update_close_guest_folio(?,?)}";
-
+        
         try (Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
             cs.setLong(1, GuestFolioFrom.getGuestFolioId());
@@ -295,9 +348,9 @@ public class GuestFolioBean implements Serializable {
         } catch (SQLException se) {
             System.err.println(se.getMessage());
         }
-
+        
     }
-
+    
     public void clearGuestFolio(GuestFolio guest_folio) {
         if (guest_folio != null) {
             guest_folio.setGuestFolioId(0);
@@ -305,9 +358,11 @@ public class GuestFolioBean implements Serializable {
             guest_folio.setStatus("");
             guest_folio.setStartDate(null);
             guest_folio.setEndDate(null);
+            guest_folio.setChildren(null);
+            guest_folio.setAdults(null);
         }
     }
-
+    
     public void initClearGuestFolio(GuestFolio guest_folio) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -319,15 +374,15 @@ public class GuestFolioBean implements Serializable {
             guest_folio.setEndDate(null);
         }
     }
-
+    
     public void clearSelectedGuestFolio() {
         this.clearGuestFolio(this.getSelectedGuestFolio());
     }
-
+    
     public void clearSelectedBillGuestFolio() {
         this.clearGuestFolio(this.getSelectedBillGuestFolio());
     }
-
+    
     public List<GuestFolio> getGuestFolios() {
         String sql;
         sql = "{call sp_search_guest_folio_by_name(?)}";
@@ -354,7 +409,7 @@ public class GuestFolioBean implements Serializable {
         }
         return GuestFolios;
     }
-
+    
     public List<GuestFolio> getGuestFoliosByTransactor_Amounts(Transactor transactor, Transactor billOther) {
         String sql;
         sql = "{call sp_report_current_guest_folio_summary_by_transactor(?)}";
@@ -387,7 +442,7 @@ public class GuestFolioBean implements Serializable {
         }
         return NewGuestFolios;
     }
-
+    
     public List<GuestFolio> getGuestFoliosByTransactor(Transactor transactor, Transactor billOther) {
         String sql;
         sql = "{call sp_search_guest_folio_by_transactor(?)}";
@@ -420,7 +475,7 @@ public class GuestFolioBean implements Serializable {
         }
         return NewGuestFolios;
     }
-
+    
     public void setGuestFolios(List<GuestFolio> GuestFolios) {
         this.GuestFolios = GuestFolios;
     }
@@ -486,7 +541,7 @@ public class GuestFolioBean implements Serializable {
         }
         return GuestFolioObjectList;
     }
-
+    
     public List<GuestFolio> getReportGuestFolios(GuestFolio aGuestFolio, boolean RETRIEVE_REPORT) {
         String sql = "{call sp_report_guest_folio(?)}";
         ResultSet rs = null;
@@ -516,7 +571,7 @@ public class GuestFolioBean implements Serializable {
         }
         return this.ReportGuestFolios;
     }
-
+    
     public long getReportGuestFoliosCount() {
         return this.ReportGuestFolios.size();
     }
@@ -597,7 +652,7 @@ public class GuestFolioBean implements Serializable {
     public void setSelectedSchemeGuestFolio(GuestFolio SelectedSchemeGuestFolio) {
         this.SelectedSchemeGuestFolio = SelectedSchemeGuestFolio;
     }
-
+    
     public List<GuestFolio> getReportCurrentGuestFolioSummaryByTransactor(long aBillTransactorId) {
         String sql;
         sql = "{call sp_report_current_guest_folio_summary_by_transactor(?)}";

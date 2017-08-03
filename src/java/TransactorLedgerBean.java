@@ -296,7 +296,7 @@ public class TransactorLedgerBean implements Serializable {
 
     }
 
-    public float get_ledger_balance(int transactor_ledger_id, int transactor_id, Date transaction_date1, Date transaction_date2,String CurrencyTypeName) {
+    public float get_ledger_balance(int transactor_ledger_id, int transactor_id, Date transaction_date1, Date transaction_date2, String CurrencyTypeName) {
         float balance = 0;
         String sql;
         sql = "{call sp_report_transactor_ledger_balance(?,?,?,?)}";
@@ -423,6 +423,90 @@ public class TransactorLedgerBean implements Serializable {
         return this.ReportTransactorLedger;
     }
 
+    public List<TransactorLedger> getReportTransactorLedger_Guest_Folio(TransactorLedger aTransactorLedger) {
+        //Test
+        String sql;
+        sql = "{call sp_report_transactor_ledger_detail_guest_folio(?,?,?,?,?,?,?,?)}";
+        ResultSet rs = null;
+        this.ReportTransactorLedger.clear();
+        if (aTransactorLedger != null) {
+//            if (aTransactorLedger.getTransactionDate() == null && aTransactorLedger.getTransactionDate2() == null
+//                    && aTransactorLedger.getAddDate() == null && aTransactorLedger.getAddDate2() == null) {
+//                this.ActionMessage = (("Atleast one date range(TransactionDate or AddDate) is needed..."));
+//            } else if (aTransactorLedger.getTransactionDate() == null && aTransactorLedger.getTransactionDate2() != null) {
+//                this.ActionMessage = (("Transaction Date(From) is needed..."));
+//            } else if (aTransactorLedger.getTransactionDate() != null && aTransactorLedger.getTransactionDate2() == null) {
+//                this.ActionMessage = (("Transaction Date(T0) is needed..."));
+//            } else if (aTransactorLedger.getAddDate() == null && aTransactorLedger.getAddDate2() != null) {
+//                this.ActionMessage = (("Add Date(From) is needed..."));
+//            } else if (aTransactorLedger.getAddDate() != null && aTransactorLedger.getAddDate2() == null) {
+//                this.ActionMessage = (("Add Date(To) is needed..."));
+//            } else {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                try {
+                    ps.setInt(1, aTransactorLedger.getStoreId());
+                } catch (NullPointerException npe) {
+                    ps.setInt(1, 0);
+                }
+                try {
+                    ps.setDate(2, new java.sql.Date(aTransactorLedger.getTransactionDate().getTime()));
+                } catch (NullPointerException npe) {
+                    ps.setDate(2, null);
+                }
+                try {
+                    ps.setDate(3, new java.sql.Date(aTransactorLedger.getTransactionDate2().getTime()));
+                } catch (NullPointerException npe) {
+                    ps.setDate(3, null);
+                }
+                try {
+                    ps.setTimestamp(4, new java.sql.Timestamp(aTransactorLedger.getAddDate().getTime()));
+                } catch (NullPointerException npe) {
+                    ps.setTimestamp(4, null);
+                }
+                try {
+                    ps.setTimestamp(5, new java.sql.Timestamp(aTransactorLedger.getAddDate2().getTime()));
+                } catch (NullPointerException npe) {
+                    ps.setTimestamp(5, null);
+                }
+                try {
+                    ps.setLong(6, aTransactorLedger.getBillTransactorId());
+                } catch (NullPointerException npe) {
+                    ps.setLong(6, 0);
+                }
+                try {
+                    ps.setString(7, aTransactorLedger.getTransactionTypeName());
+                } catch (NullPointerException npe) {
+                    ps.setString(7, "");
+                }
+                try {
+                    ps.setInt(8, aTransactorLedger.getGuestFolioId());
+                } catch (NullPointerException npe) {
+                    ps.setInt(8, 0);
+                }
+                rs = ps.executeQuery();
+                //System.out.println(rs.getStatement());
+                while (rs.next()) {
+                    this.ReportTransactorLedger.add(this.getTransactorLedgerFromResultset(rs));
+                }
+                this.ActionMessage = ((""));
+            } catch (SQLException se) {
+                System.err.println(se.getMessage());
+            } finally {
+                if (rs != null) {
+                    try {
+                        rs.close();
+                    } catch (SQLException ex) {
+                        System.err.println(ex.getMessage());
+                    }
+                }
+            }
+        }
+        //}
+        return this.ReportTransactorLedger;
+    }
+
     public long getReportTransactionCount() {
         return this.ReportTransactorLedger.size();
     }
@@ -440,6 +524,57 @@ public class TransactorLedgerBean implements Serializable {
                     ps.setLong(1, aBillTransactorId);
                 } catch (NullPointerException npe) {
                     ps.setLong(1, 0);
+                }
+                rs = ps.executeQuery();
+                //System.out.println(rs.getStatement());
+                TransactorLedger TmpTransactorLedger;
+                while (rs.next()) {
+                    TmpTransactorLedger = new TransactorLedger();
+                    TmpTransactorLedger.setSumAmountDebit(rs.getFloat("sum_amount_debit"));
+                    TmpTransactorLedger.setSumAmountCredit(rs.getFloat("sum_amount_credit"));
+                    TmpTransactorLedger.setCurrencyTypeName(rs.getString("currency_type_name"));
+                    if ((rs.getFloat("sum_amount_debit") - rs.getFloat("sum_amount_credit")) < 0) {
+                        TmpTransactorLedger.setNetDebt(0);
+                    } else {
+                        TmpTransactorLedger.setNetDebt(rs.getFloat("sum_amount_debit") - rs.getFloat("sum_amount_credit"));
+                    }
+                    if ((rs.getFloat("sum_amount_credit") - rs.getFloat("sum_amount_debit")) < 0) {
+                        TmpTransactorLedger.setNetCredit(0);
+                    } else {
+                        TmpTransactorLedger.setNetCredit(rs.getFloat("sum_amount_credit") - rs.getFloat("sum_amount_debit"));
+                    }
+                    this.ReportTransactorLedgerSummary.add(TmpTransactorLedger);
+                }
+                //this.ActionMessage=((""));
+            } catch (SQLException se) {
+                System.err.println(se.getMessage());
+            } finally {
+                if (rs != null) {
+                    try {
+                        rs.close();
+                    } catch (SQLException ex) {
+                        System.err.println(ex.getMessage());
+                    }
+                }
+            }
+        }
+        return this.ReportTransactorLedgerSummary;
+    }
+    public List<TransactorLedger> getReportTransactorLedgerSummarySingleIndividual_Guest_Folio(long aBillTransactorId,long GuestFolioId) {
+        String sql;
+        sql = "{call sp_report_transactor_ledger_summary_single_individual_folio(?,?)}";
+        ResultSet rs = null;
+        this.ReportTransactorLedgerSummary.clear();
+        if (aBillTransactorId != 0) {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                try {
+                    ps.setLong(1, aBillTransactorId);
+                    ps.setLong(2, GuestFolioId);
+                } catch (NullPointerException npe) {
+                    ps.setLong(1, 0);
+                    ps.setLong(2, 0);
                 }
                 rs = ps.executeQuery();
                 //System.out.println(rs.getStatement());
@@ -494,6 +629,79 @@ public class TransactorLedgerBean implements Serializable {
                     ps.setLong(1, 0);
                     ps.setDate(2, null);
                     ps.setDate(3, null);
+                }
+                rs = ps.executeQuery();
+                //System.out.println(rs.getStatement());
+                TransactorLedgerRoomDetails TmpTransactorLedgerRoomDetails;
+                while (rs.next()) {
+                    TmpTransactorLedgerRoomDetails = new TransactorLedgerRoomDetails();
+                    try {
+                        TmpTransactorLedgerRoomDetails.setTransactorName(rs.getString("transactor_names"));
+                    } catch (NullPointerException ex) {
+                        TmpTransactorLedgerRoomDetails.setTransactorName("");
+                    }
+                    try {
+                        TmpTransactorLedgerRoomDetails.setRoomNumber(rs.getString("room_number"));
+                    } catch (NullPointerException ex) {
+                        TmpTransactorLedgerRoomDetails.setRoomNumber("");
+                    }
+                    try {
+                        TmpTransactorLedgerRoomDetails.setStartDate(rs.getDate("start_date"));
+                    } catch (NullPointerException ex) {
+                        TmpTransactorLedgerRoomDetails.setStartDate(null);
+                    }
+                    try {
+                        TmpTransactorLedgerRoomDetails.setEndDate(rs.getDate("end_date"));
+                    } catch (NullPointerException ex) {
+                        TmpTransactorLedgerRoomDetails.setEndDate(null);
+                    }
+                    try {
+                        TmpTransactorLedgerRoomDetails.setActualExitDate(rs.getDate("actual_exit_date"));
+                    } catch (NullPointerException ex) {
+                        TmpTransactorLedgerRoomDetails.setActualExitDate(null);
+                    }
+                    try {
+                        TmpTransactorLedgerRoomDetails.setCheckedOutBy(rs.getString("checked_out_by"));
+                    } catch (NullPointerException ex) {
+                        TmpTransactorLedgerRoomDetails.setCheckedOutBy("");
+                    }
+                    this.ReportTransactorLedgerRoomDetails.add(TmpTransactorLedgerRoomDetails);
+                }
+                //this.ActionMessage=((""));
+            } catch (SQLException se) {
+                System.err.println(se.getMessage());
+            } finally {
+                if (rs != null) {
+                    try {
+                        rs.close();
+                    } catch (SQLException ex) {
+                        System.err.println(ex.getMessage());
+                    }
+                }
+            }
+        }
+        return this.ReportTransactorLedgerRoomDetails;
+    }
+
+    public List<TransactorLedgerRoomDetails> getReportTransactorLedgerRoomDetails_Guest_Folio(TransactorLedger aTransactorLedger,long GuestFolioId) {
+        String sql;
+        sql = "{call sp_report_transactor_ledger_summary_room_details_guest_folio(?,?,?,?)}";
+        ResultSet rs = null;
+        this.ReportTransactorLedgerRoomDetails.clear();
+        if (aTransactorLedger != null) {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                try {
+                    ps.setLong(1, aTransactorLedger.getBillTransactorId());
+                    ps.setDate(2, null);
+                    ps.setDate(3, null);
+                    ps.setLong(4, GuestFolioId);
+                } catch (NullPointerException npe) {
+                    ps.setLong(1, 0);
+                    ps.setDate(2, null);
+                    ps.setDate(3, null);
+                    ps.setLong(4, 0);
                 }
                 rs = ps.executeQuery();
                 //System.out.println(rs.getStatement());

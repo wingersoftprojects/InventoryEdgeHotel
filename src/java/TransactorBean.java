@@ -1,3 +1,4 @@
+
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -502,37 +503,35 @@ public class TransactorBean implements Serializable {
     public void initClearTransactor(Transactor transactor) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
-        } else {
-            if (transactor != null) {
-                transactor.setTransactorId(0);
-                transactor.setTransactorType("");
-                transactor.setTransactorNames("");
-                transactor.setPhone("");
-                transactor.setEmail("");
-                transactor.setWebsite("");
-                transactor.setCpName("");
-                transactor.setCpTitle("");
-                transactor.setCpEmail("");
-                transactor.setCpPhone("");
-                transactor.setPhysicalAddress("");
-                transactor.setTaxIdentity("");
-                transactor.setAccountDetails("");
-                transactor.setCardNumber("");
-                transactor.setDOB(null);
-                transactor.setIsSuspended("");
-                transactor.setSuspendedReason("");
-                transactor.setCategory("");
-                transactor.setSex("");
-                transactor.setOccupation("");
-                transactor.setLocCountry("");
-                transactor.setLocDistrict("");
-                transactor.setLocTown("");
-                transactor.setFirstDate(null);
-                transactor.setFileReference("");
-                transactor.setIdType("");
-                transactor.setIdNumber("");
-                transactor.setIdExpiryDate(null);
-            }
+        } else if (transactor != null) {
+            transactor.setTransactorId(0);
+            transactor.setTransactorType("");
+            transactor.setTransactorNames("");
+            transactor.setPhone("");
+            transactor.setEmail("");
+            transactor.setWebsite("");
+            transactor.setCpName("");
+            transactor.setCpTitle("");
+            transactor.setCpEmail("");
+            transactor.setCpPhone("");
+            transactor.setPhysicalAddress("");
+            transactor.setTaxIdentity("");
+            transactor.setAccountDetails("");
+            transactor.setCardNumber("");
+            transactor.setDOB(null);
+            transactor.setIsSuspended("");
+            transactor.setSuspendedReason("");
+            transactor.setCategory("");
+            transactor.setSex("");
+            transactor.setOccupation("");
+            transactor.setLocCountry("");
+            transactor.setLocDistrict("");
+            transactor.setLocTown("");
+            transactor.setFirstDate(null);
+            transactor.setFileReference("");
+            transactor.setIdType("");
+            transactor.setIdNumber("");
+            transactor.setIdExpiryDate(null);
         }
     }
 
@@ -774,6 +773,45 @@ public class TransactorBean implements Serializable {
      */
     public void setSelectedSchemeTransactor(Transactor SelectedSchemeTransactor) {
         this.SelectedSchemeTransactor = SelectedSchemeTransactor;
+    }
+
+    /**
+     * @return the GuestFolios
+     */
+    public List<GuestFolio> getGuestFolios() {
+        String sql;
+        sql = "{call sp_search_guest_folio_by_transaction_id(?)}";
+        ResultSet rs = null;
+        List<GuestFolio> guestFolios = new ArrayList<>();
+        if (SelectedBillTransactor != null) {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setLong(1, SelectedBillTransactor.getTransactorId());
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    GuestFolio guestFolio = new GuestFolio();
+                    guestFolio.setGuestFolioId(rs.getInt("guest_folio_id"));
+                    guestFolio.setTransactorName(rs.getString("transactor_names"));
+                    guestFolio.setStartDate(rs.getDate("start_date"));
+                    guestFolio.setEndDate(rs.getDate("end_date"));
+                    guestFolio.setStatus(rs.getString("status"));
+                    guestFolio.setIsCurrent(rs.getString("is_current"));
+                    guestFolios.add(guestFolio);
+                }
+            } catch (SQLException se) {
+                System.err.println(se.getMessage());
+            } finally {
+                if (rs != null) {
+                    try {
+                        rs.close();
+                    } catch (SQLException ex) {
+                        System.err.println(ex.getMessage());
+                    }
+                }
+            }
+        }
+        return guestFolios;
     }
 
 }

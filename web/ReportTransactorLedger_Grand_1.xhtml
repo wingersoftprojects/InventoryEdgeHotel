@@ -33,7 +33,25 @@
             <h:panelGrid id="id0" columns="1" styleClass="clsPanelReportFilterTitle">
                 <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Transactors Ledger Report - Detail"/>
             </h:panelGrid>
-            <h:panelGrid id="id1" columns="2" styleClass="clsPanelReportFilter">
+            <h:panelGrid id="id1" columns="8" styleClass="clsPanelReportFilter">
+                <!--<p:outputLabel styleClass="clsLabelReportFilter" id="id2" value="Store:"/>
+                <h:selectOneMenu styleClass="clsInputReportFilter" id="menuFromStore" value="#{transactorLedger.storeId}" >
+                    <f:selectItem itemLabel="" itemValue="0"/>
+                    <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
+                </h:selectOneMenu>
+                <h:outputLabel styleClass="clsLabelReportFilter" id="id4" value="TransType:"/>
+                <h:selectOneMenu styleClass="clsInputReportFilter" id="menuTransactionType" value="#{transactorLedger.transactionTypeName}">
+                    <f:selectItem itemLabel="" itemValue=""/>
+                    <f:selectItem itemLabel="SALE INVOICE" itemValue="SALE INVOICE"/>
+                    <f:selectItem itemLabel="PURCHASE INVOICE" itemValue="PURCHASE INVOICE"/>
+                </h:selectOneMenu>
+
+                <p:outputLabel for="calTransDateFrom" styleClass="clsLabelReportFilter" id="id10" value="TransDate(From):"/>
+                <p:calendar styleClass="clsInputReportFilter" id="calTransDateFrom" pattern="dd-MM-yyyy" navigator="true" showButtonPanel="true" readonlyInput="false" value="#{transactorLedger.transactionDate}" required="true">
+                </p:calendar>
+                <p:outputLabel for="calTransDateTo" styleClass="clsLabelReportFilter" id="id11" value="TransDate(To):"/>
+                <p:calendar styleClass="clsInputReportFilter" id="calTransDateTo" pattern="dd-MM-yyyy" navigator="true" showButtonPanel="true" readonlyInput="false" value="#{transactorLedger.transactionDate2}" required="true">
+                </p:calendar>-->
                 <p:outputLabel for="autcTransactor" styleClass="clsLabelReportFilter" id="id14" value="Bill Guest/Customer"/>
                 <p:autoComplete styleClass="clsInputReportFilter" id="autcTransactor" value="#{transactorBean.selectedBillTransactor}" 
                                 completeMethod="#{transactorBean.getTransactorObjectList}" 
@@ -49,18 +67,17 @@
                     <p:column headerText="Contact Person" style="text-align: left">  
                         #{trct.cpName} 
                     </p:column> 
-                    <p:ajax event="itemSelect" listener="#{transactorLedger.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}" update="menuGuestFolio,FolioDetails" process="@this,menuGuestFolio"/>
-                    <p:ajax event="change" listener="#{transactorLedger.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null}" update="menuGuestFolio,FolioDetails" process="@this,menuGuestFolio"/>
-                    <p:ajax event="itemSelect" listener="#{guestFolioBean.set_guest_folio_null()}" update="@form"/>
-                    <p:ajax event="change" listener="#{guestFolioBean.set_guest_folio_null()}" update="@form"/>
+                    <p:ajax event="itemSelect" listener="#{transactorLedger.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}" update="menuGuestFolio,FolioDetails" process="@this"/>
+                    <p:ajax event="change" listener="#{transactorLedger.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null}" update="menuGuestFolio,FolioDetails" process="@this"/>
                 </p:autoComplete>
 
+                <p:commandButton styleClass="clsButtonReportFilter" id="cmdbSearch" value="Search" update="@form" />
+
                 <p:outputLabel styleClass="clsLabelReportFilter" id="id22" value="Folio:"/>
-                <p:selectOneMenu styleClass="clsInputReportFilter" id="menuGuestFolio" value="#{transactorLedger.guestFolioId}" >
-                    <f:selectItem itemLabel="--Select--" itemValue=""/>
+                <h:selectOneMenu styleClass="clsInputReportFilter" id="menuGuestFolio" value="#{transactorLedger.guestFolioId}" >
                     <f:selectItems value="#{transactorBean.guestFolios}" var="tst" itemLabel="#{tst.startDate} to #{tst.endDate} - #{tst.transactorName}" itemValue="#{tst.guestFolioId}"/>
-                    <p:ajax event="change" partialSubmit="true" listener="#{guestFolioBean.set_guest_folio(transactorLedger.guestFolioId)}" update="@form" process="@this"/>
-                </p:selectOneMenu>
+                    <f:ajax listener="#{guestFolioBean.set_guest_folio(transactorLedger.guestFolioId)}" render="@form"/>
+                </h:selectOneMenu>
             </h:panelGrid>
             <h:panelGrid id="pnlgActionMessage">
                 <p:outputLabel value="#{transactorLedgerBean.actionMessage}" style="color: red;"/>
@@ -91,7 +108,7 @@
                     <h:outputLabel value="GUEST FOLIO" style="font-size:30px;font-weight: bold;"/>
                 </h:panelGrid>
                 <h:panelGrid columns="2" style="width: 100% !important;">
-                    <p:dataTable tableStyle="width:auto;" id="tblTransactorLedgerSummary" var="rtss" value="#{transactorLedgerBean.getReportTransactorLedgerSummarySingleIndividual_Guest_Folio(transactorLedger.billTransactorId,guestFolioBean.guestFolio.guestFolioId)}" 
+                    <p:dataTable tableStyle="width:auto;" id="tblTransactorLedgerSummary" var="rtss" value="#{transactorLedgerBean.getReportTransactorLedgerSummarySingleIndividual(transactorLedger.billTransactorId)}" 
                                  >
                         <f:facet name="header">
                             Transactor Ledger Summary Report
@@ -249,7 +266,7 @@
                 </p:dataTable>
 
                 <P CLASS="breakhere"></P>                 
-                <p:dataTable tableStyle="width:auto;" id="tblTransactorLedgerRoomDetails" var="rtlrd" value="#{transactorLedgerBean.getReportTransactorLedgerRoomDetails_Guest_Folio(transactorLedger,guestFolioBean.guestFolio.guestFolioId)}">
+                <p:dataTable tableStyle="width:auto;" id="tblTransactorLedgerRoomDetails" var="rtlrd" value="#{transactorLedgerBean.getReportTransactorLedgerRoomDetails(transactorLedger)}">
                     <f:facet name="header">
                         Guest Room Details
                     </f:facet>               

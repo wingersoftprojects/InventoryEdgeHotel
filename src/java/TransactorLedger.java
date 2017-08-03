@@ -8,7 +8,6 @@ import javax.faces.bean.SessionScoped;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author btwesigye
@@ -51,12 +50,22 @@ public class TransactorLedger implements Serializable {
     private float UnitTradeDiscount;
     private String PostedBy;
     private String Remarks;
-    
+
+    private int GuestFolioId;
+
     private int NumberOfDays;
-    private int NumberOfPeople; 
-    
+    private int NumberOfPeople;
+
     public int getNumberOfDays() {
         return NumberOfDays;
+    }
+
+    public int getGuestFolioId() {
+        return GuestFolioId;
+    }
+
+    public void setGuestFolioId(int GuestFolioId) {
+        this.GuestFolioId = GuestFolioId;
     }
 
     public void setNumberOfDays(int NumberOfDays) {
@@ -78,7 +87,7 @@ public class TransactorLedger implements Serializable {
     public void setRemarks(String Remarks) {
         this.Remarks = Remarks;
     }
-    
+
     private String CurrencyTypeName;
     private float ExchangeRate;
 
@@ -105,7 +114,7 @@ public class TransactorLedger implements Serializable {
     public void setPostedBy(String PostedBy) {
         this.PostedBy = PostedBy;
     }
-    
+
     public float getQuantity() {
         return Quantity;
     }
@@ -130,8 +139,6 @@ public class TransactorLedger implements Serializable {
         this.UnitTradeDiscount = UnitTradeDiscount;
     }
 
-    
-
     public String getItemDescription() {
         return ItemDescription;
     }
@@ -139,9 +146,7 @@ public class TransactorLedger implements Serializable {
     public void setItemDescription(String ItemDescription) {
         this.ItemDescription = ItemDescription;
     }
-            
-    
-    
+
     /**
      * @return the TransactorLedgerId
      */
@@ -477,5 +482,5 @@ public class TransactorLedger implements Serializable {
     public void setBillTransactorNames(String BillTransactorNames) {
         this.BillTransactorNames = BillTransactorNames;
     }
-    
+
 }

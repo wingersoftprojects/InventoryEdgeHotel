@@ -31,6 +31,10 @@
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="4">
+                <h:outputLabel styleClass="clsLabel" value="Adults:"/>
+                <p:inputText styleClass="clsInput" value="#{guestFolio.adults}" required="true" requiredMessage="Number Of Adults Is a required field"/>
+                <h:outputLabel styleClass="clsLabel" value="Children:"/>
+                <p:inputText styleClass="clsInput" value="#{guestFolio.children}" required="true" requiredMessage="Number Of Children Is a required field"/>
                 <h:outputLabel styleClass="clsLabel" value="Start Date:"/>
                 <p:calendar styleClass="clsInput" navigator="true" showButtonPanel="true" value="#{guestFolio.startDate}" pattern="#{companySetting.getDateFormat()}"/>
                 <h:outputLabel styleClass="clsLabel" value="End Date:"/>
@@ -89,6 +93,22 @@
 
             <p:dataTable tableStyle="width:auto;" id="dtblGuestFolio" value="#{guestFolioBean.getGuestFoliosByTransactor(guestFolio.transactor,null)}" var="t" 
                          > 
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Adults</f:facet>
+                    <!-- row record -->
+                    <h:outputLabel value="#{t.adults}">
+                        
+                    </h:outputLabel>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Children</f:facet>
+                    <!-- row record -->
+                    <h:outputLabel value="#{t.children}">
+                        
+                    </h:outputLabel>
+                </p:column>
                 <p:column>
                     <!-- column header -->
                     <f:facet name="header">Start Date</f:facet>
