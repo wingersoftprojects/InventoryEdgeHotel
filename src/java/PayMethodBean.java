@@ -14,48 +14,50 @@ public class PayMethodBean implements Serializable {
     private static final long serialVersionUID = 1L;
     private List<PayMethod> PayMethods;
     private String ActionMessage;
-    private PayMethod SelectedPayMethod=null;
+    private PayMethod SelectedPayMethod = null;
     private int SelectedPayMethodId;
-    private String SearchPayMethodName="";
-    
+    private String SearchPayMethodName = "";
+
     public void savePayMethod(PayMethod pm) {
         String sql = null;
-        String msg=null;
-        UserDetail aCurrentUserDetail=new GeneralUserSetting().getCurrentUser();
-        List<GroupRight> aCurrentGroupRights=new GeneralUserSetting().getCurrentGroupRights();
-        GroupRightBean grb=new GroupRightBean();
-        
-        if (pm.getPayMethodId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail,aCurrentGroupRights,"SETTING", "Add")==0) {
-            msg="YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        }else if (pm.getPayMethodId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail,aCurrentGroupRights,"SETTING", "Edit")==0) {
-            msg="YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        }else{
-        if (pm.getPayMethodId() == 0) {
-            sql = "{call sp_insert_pay_method(?)}";
-        } else if (pm.getPayMethodId() > 0) {
-            sql = "{call sp_update_pay_method(?,?)}";
-        }
+        String msg = null;
+        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb = new GroupRightBean();
 
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                CallableStatement cs = conn.prepareCall(sql);) {
+        if (pm.getPayMethodId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "SETTING", "Add") == 0) {
+            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+        } else if (pm.getPayMethodId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "SETTING", "Edit") == 0) {
+            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+        } else {
             if (pm.getPayMethodId() == 0) {
-                cs.setString(1, pm.getPayMethodName());
-                cs.executeUpdate();
-                this.setActionMessage("Saved Successfully");
+                sql = "{call sp_insert_pay_method(?,?)}";
             } else if (pm.getPayMethodId() > 0) {
-                cs.setInt(1, pm.getPayMethodId());
-                cs.setString(2, pm.getPayMethodName());
-                cs.executeUpdate();
-                this.setActionMessage("Saved Successfully");
+                sql = "{call sp_update_pay_method(?,?,?)}";
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-            this.setActionMessage("PayMethod NOT saved");
+
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    CallableStatement cs = conn.prepareCall(sql);) {
+                if (pm.getPayMethodId() == 0) {
+                    cs.setString(1, pm.getPayMethodName());
+                    cs.setFloat(2, pm.getSurchage());
+                    cs.executeUpdate();
+                    this.setActionMessage("Saved Successfully");
+                } else if (pm.getPayMethodId() > 0) {
+                    cs.setInt(1, pm.getPayMethodId());
+                    cs.setString(2, pm.getPayMethodName());
+                    cs.setFloat(3, pm.getSurchage());
+                    cs.executeUpdate();
+                    this.setActionMessage("Saved Successfully");
+                }
+            } catch (SQLException se) {
+                System.err.println(se.getMessage());
+                this.setActionMessage("PayMethod NOT saved");
+            }
         }
-      }
     }
 
     public PayMethod getPayMethod(int aPayMethodId) {
@@ -88,36 +90,36 @@ public class PayMethodBean implements Serializable {
         }
 
     }
-    
+
     public void deletePayMethod() {
-         this.deletePayMethodById(this.SelectedPayMethodId);
+        this.deletePayMethodById(this.SelectedPayMethodId);
     }
+
     public void deletePayMethodByObject(PayMethod pm) {
-         this.deletePayMethodById(pm.getPayMethodId());
+        this.deletePayMethodById(pm.getPayMethodId());
     }
 
     public void deletePayMethodById(int PMId) {
         String sql = "DELETE FROM pay_method WHERE pay_method_id=?";
         String msg;
-        UserDetail aCurrentUserDetail=new GeneralUserSetting().getCurrentUser();
-        List<GroupRight> aCurrentGroupRights=new GeneralUserSetting().getCurrentGroupRights();
-        GroupRightBean grb=new GroupRightBean();
+        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb = new GroupRightBean();
 
-        if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail,aCurrentGroupRights,"SETTING", "Delete")==0) {
-            msg="YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+        if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "SETTING", "Delete") == 0) {
+            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        }else
-        {
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setInt(1, PMId);
-            ps.executeUpdate();
-            this.setActionMessage("Deleted Successfully!");
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-            this.setActionMessage("PayMethod NOT deleted");
-        }
+        } else {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setInt(1, PMId);
+                ps.executeUpdate();
+                this.setActionMessage("Deleted Successfully!");
+            } catch (SQLException se) {
+                System.err.println(se.getMessage());
+                this.setActionMessage("PayMethod NOT deleted");
+            }
         }
     }
 
@@ -130,10 +132,10 @@ public class PayMethodBean implements Serializable {
         Cat.setPayMethodId(0);
         Cat.setPayMethodName("");
     }
-    
+
     public List<PayMethod> getPayMethods() {
         String sql;
-        sql="{call sp_search_pay_method_by_none()}";
+        sql = "{call sp_search_pay_method_by_none()}";
         ResultSet rs = null;
         PayMethods = new ArrayList<PayMethod>();
         try (
@@ -166,7 +168,7 @@ public class PayMethodBean implements Serializable {
      */
     public List<PayMethod> getPayMethodsByPayMethodName(String aPayMethodName) {
         String sql;
-        sql="{call sp_search_pay_method_by_name(?)}";
+        sql = "{call sp_search_pay_method_by_name(?)}";
         ResultSet rs = null;
         PayMethods = new ArrayList<PayMethod>();
         try (
@@ -256,5 +258,5 @@ public class PayMethodBean implements Serializable {
     public void setActionMessage(String ActionMessage) {
         this.ActionMessage = ActionMessage;
     }
-    
+
 }

@@ -9,6 +9,7 @@ public class PayMethod implements Serializable {
     private static final long serialVersionUID = 1L;
     private int PayMethodId;
     private String PayMethodName;
+    private float Surchage;
 
     /**
      * @return the PayMethodId
@@ -36,5 +37,13 @@ public class PayMethod implements Serializable {
      */
     public void setPayMethodName(String PayMethodName) {
         this.PayMethodName = PayMethodName;
+    }
+
+    public float getSurchage() {
+        return Surchage;
+    }
+
+    public void setSurchage(float Surchage) {
+        this.Surchage = Surchage;
     }
 }

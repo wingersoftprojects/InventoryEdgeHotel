@@ -39,6 +39,9 @@ public class Pay implements Serializable {
     private int CurrencyTypeId;
     private String CurrencyTypeName;
     private float ExchangeRate;
+    
+    private float surcharge;
+    private float total_amount;
 
     public String getCurrencyTypeName() {
         return CurrencyTypeName;
@@ -315,5 +318,23 @@ public class Pay implements Serializable {
     public void setStoreId(int StoreId) {
         this.StoreId = StoreId;
     }
+
+    public float getSurcharge() {
+        return surcharge;
+    }
+
+    public void setSurcharge(float surcharge) {
+        this.surcharge = surcharge;
+    }
+
+    public float getTotal_amount() {
+        return total_amount;
+    }
+
+    public void setTotal_amount(float total_amount) {
+        this.total_amount = total_amount;
+    }
+    
+    
     
 }

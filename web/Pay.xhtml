@@ -60,31 +60,31 @@
                         <h:outputLabel styleClass="clsLabel" value="#{transactionTypeBean.getTransactionType(2).transactorLabel}:" rendered="#{generalUserSetting.getCurrentPayCategory().equals('IN')}"/>
                         <h:outputLabel styleClass="clsLabel" value="#{transactionTypeBean.getTransactionType(1).transactorLabel}:" rendered="#{generalUserSetting.getCurrentPayCategory().equals('OUT')}"/>
                         <p:outputPanel>
-                        <p:autoComplete id="autcTransactor" value="#{payBean.selectedBillTransactor}" 
-                                        completeMethod="#{transactorBean.getTransactorObjectList}" 
-                                        var="trct" 
-                                        itemLabel="#{trct.transactorNames}" 
-                                        itemValue="#{trct}" 
-                                        converter="TransactorConverter" style="text-align: left" 
-                                        forceSelection="true" 
-                                        rendered="#{payBean.searchBy.equals('Name')}"
-                                        >
-                            <p:column headerText="Transactor Names" style="text-align: left" >  
-                                #{trct.transactorNames} 
-                            </p:column> 
-                            <p:column headerText="Type" style="text-align: left" >  
-                                #{trct.transactorType} 
-                            </p:column> 
-                            <p:column headerText="Contact Person" style="text-align: left">  
-                                #{trct.cpName} 
-                            </p:column> 
-                            <p:ajax event="itemSelect" listener="#{pay.setBillTransactorId(payBean.selectedBillTransactor.transactorId)}" update="pnlTransType,buttons,dtblPay" />
-                            <p:ajax event="change" listener="#{pay.setBillTransactorId(payBean.selectedBillTransactor.transactorId)}" rendered="#{payBean.selectedBillTransactor!=null}" update="pnlTransType,buttons,dtblPay" />
-                        </p:autoComplete>    
+                            <p:autoComplete id="autcTransactor" value="#{payBean.selectedBillTransactor}" 
+                                            completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                            var="trct" 
+                                            itemLabel="#{trct.transactorNames}" 
+                                            itemValue="#{trct}" 
+                                            converter="TransactorConverter" style="text-align: left" 
+                                            forceSelection="true" 
+                                            rendered="#{payBean.searchBy.equals('Name')}"
+                                            >
+                                <p:column headerText="Transactor Names" style="text-align: left" >  
+                                    #{trct.transactorNames} 
+                                </p:column> 
+                                <p:column headerText="Type" style="text-align: left" >  
+                                    #{trct.transactorType} 
+                                </p:column> 
+                                <p:column headerText="Contact Person" style="text-align: left">  
+                                    #{trct.cpName} 
+                                </p:column> 
+                                <p:ajax event="itemSelect" listener="#{pay.setBillTransactorId(payBean.selectedBillTransactor.transactorId)}" update="pnlTransType,buttons,dtblPay" />
+                                <p:ajax event="change" listener="#{pay.setBillTransactorId(payBean.selectedBillTransactor.transactorId)}" rendered="#{payBean.selectedBillTransactor!=null}" update="pnlTransType,buttons,dtblPay" />
+                            </p:autoComplete>    
                             <p:commandButton id="newfolio" value="New Folio" process="@this" update=":guestfolioform" oncomplete="PF('GuestFolioDialog').show();">
-                    </p:commandButton>
+                            </p:commandButton>
                         </p:outputPanel>
-                                            </h:panelGrid>
+                    </h:panelGrid>
                     <h:panelGrid styleClass="clsGridMainInput" columns="2" rendered="#{payBean.searchBy.equals('InvoiceNo')}">
                         <h:outputLabel styleClass="clsLabel" value="#{transactionTypeBean.getTransactionType(2).transactionNumberLabel}:" rendered="#{generalUserSetting.getCurrentPayCategory().equals('IN')}"/>
                         <h:outputLabel styleClass="clsLabel" value="#{transactionTypeBean.getTransactionType(1).transactionNumberLabel}:" rendered="#{generalUserSetting.getCurrentPayCategory().equals('OUT')}"/>
@@ -131,6 +131,7 @@
                     <h:outputLabel styleClass="clsLabel" style="width: 250px;" value="Payment Method:" for="menuPayMethod"/>
                     <h:selectOneMenu styleClass="clsMenu" style="width: 250px;" id="menuPayMethod" value="#{pay.payMethodId}" required="true">
                         <f:selectItems value="#{payMethodBean.payMethods}" var="pm" itemLabel="#{pm.payMethodName}" itemValue="#{pm.payMethodId}"/>
+                        <f:ajax listener="#{payBean.compute_surcharge_total_amount(pay.payMethodId, pay)}" execute="@this" render="itxtSurcharge itxtTotalAmount"/>
                     </h:selectOneMenu>
                     <h:outputLabel styleClass="clsLabel" style="width: 250px;" value="Payment Ref No:"/>
                     <h:inputText id="itxtPayRefNo" style="width: 250px;" value="#{pay.payRefNo}" styleClass="clsInputTransItem"/>
@@ -140,6 +141,13 @@
                     </h:selectOneMenu>
                     <h:outputLabel styleClass="clsLabel" style="width: 250px;" value="Paid Amount:"/>
                     <h:inputText id="itxtPaidAmount" style="width: 250px;" value="#{pay.paidAmount}" styleClass="clsInputTransItem" autocomplete="off">
+                        <f:ajax listener="#{payBean.compute_surcharge_total_amount(pay.payMethodId, pay)}" execute="@this" render="itxtSurcharge itxtTotalAmount"/>
+                    </h:inputText>
+                    <h:outputLabel styleClass="clsLabel" style="width: 250px;" value="Surchage:"/>
+                    <h:inputText id="itxtSurcharge" style="width: 250px;" value="#{pay.surcharge}" styleClass="clsInputTransItem" autocomplete="off" disabled="true">
+                    </h:inputText>
+                    <h:outputLabel styleClass="clsLabel" style="width: 250px;" value="Total Amount:"/>
+                    <h:inputText id="itxtTotalAmount" style="width: 250px;" value="#{pay.total_amount}" styleClass="clsInputTransItem" autocomplete="off" disabled="true">
                     </h:inputText>
                     <h:outputLabel styleClass="clsLabel" style="width: 250px;" value="Points Amount Spent:"/>
                     <h:inputText id="itxtSpendPointsAmount" style="width: 250px;" value="#{pay.pointsSpentAmount}" styleClass="clsInputTransItem" disabled="true">

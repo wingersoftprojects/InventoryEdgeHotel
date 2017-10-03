@@ -915,7 +915,7 @@ public class TransBean implements Serializable {
 
             //update trans
             if (isTransCopySuccess && isTransItemCopySuccess && isTransItemReverseSuccess) {
-                String newSQL = "{call sp_update_transaction2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+                String newSQL = "{call sp_update_transaction2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
                 try (
                         Connection conn = DBConnection.getMySQLConnection();
                         CallableStatement cs = conn.prepareCall(newSQL);) {
@@ -934,6 +934,16 @@ public class TransBean implements Serializable {
                     cs.setFloat("in_amount_tendered", aNewTrans.getAmountTendered());
                     cs.setFloat("in_change_amount", aNewTrans.getChangeAmount());
                     cs.setFloat("in_total_profit_margin", aNewTrans.getTotalProfitMargin());
+                    try {
+                        cs.setDate("in_start_date", new java.sql.Date(aNewTrans.getStartDate().getTime()));
+                    } catch (Exception ex) {
+                        cs.setDate("in_start_date", null);
+                    }
+                    try {
+                        cs.setDate("in_end_date", new java.sql.Date(aNewTrans.getEndDate().getTime()));
+                    } catch (Exception ex) {
+                        cs.setDate("in_end_date", null);
+                    }
                     cs.executeUpdate();
                     isTransUpdateSuccess = true;
                 } catch (SQLException se) {
@@ -1614,6 +1624,17 @@ public class TransBean implements Serializable {
             trans.setTransactionId(aResultSet.getLong("transaction_id"));
             trans.setTransactionDate(new Date(aResultSet.getDate("transaction_date").getTime()));
             trans.setStoreId(aResultSet.getInt("store_id"));
+
+            try {
+                trans.setStartDate(new Date(aResultSet.getDate("start_date").getTime()));
+            } catch (NullPointerException npe) {
+                trans.setStartDate(null);
+            }
+            try {
+                trans.setEndDate(new Date(aResultSet.getDate("end_date").getTime()));
+            } catch (NullPointerException npe) {
+                trans.setEndDate(null);
+            }
 
             try {
                 trans.setStore2Id(aResultSet.getInt("store2_id"));
@@ -3142,6 +3163,7 @@ public class TransBean implements Serializable {
             return true;
         }
     }
+
     public boolean isCreateFolio(UserDetail aUserDetail, List<GroupRight> aGroupRights) {
         GroupRightBean grb = new GroupRightBean();
         if (grb.IsUserGroupsFunctionAccessAllowed(aUserDetail, aGroupRights, "GUESTFOLIO", "Edit") == 1 && grb.IsUserGroupsFunctionAccessAllowed(aUserDetail, aGroupRights, "GUESTFOLIO", "Add") == 1) {

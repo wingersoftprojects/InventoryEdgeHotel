@@ -31,6 +31,9 @@
                 <h:outputLabel styleClass="clsLabel" value="PayMethod Name:"/>
                 <h:inputText styleClass="clsInput" id="itxtPayMethodName" value="#{payMethod.payMethodName}">
                 </h:inputText>
+                <h:outputLabel styleClass="clsLabel" value="Surchage:"/>
+                <h:inputText styleClass="clsInput" id="itxtSurcharge" value="#{payMethod.surchage}">
+                </h:inputText>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="2">
@@ -75,6 +78,12 @@
                     <f:facet name="header">Pay Method Name</f:facet>
                     <!-- row record -->
                     #{p.payMethodName}
+                </h:column>
+                <h:column>
+                    <!-- column header -->
+                    <f:facet name="header">Surcharge</f:facet>
+                    <!-- row record -->
+                    #{p.surchage}
                 </h:column>
 
                 <h:column>

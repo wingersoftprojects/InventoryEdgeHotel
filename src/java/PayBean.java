@@ -182,7 +182,7 @@ public class PayBean implements Serializable {
                             NewTransactorLedger.setLedgerEntryType("D");
                             NewTransactorLedger.setAmountDebit(pay.getPaidAmount());
                             NewTransactorLedger.setAmountCredit(0);
-                        }else{
+                        } else {
                             NewTransactorLedger.setTransactionTypeName("SALE");
                             NewTransactorLedger.setDescription("Payment Made for Bought Item(s)");
                             NewTransactorLedger.setLedgerEntryType("C");
@@ -247,14 +247,14 @@ public class PayBean implements Serializable {
     public Pay getPay(long PayId) {
         String sql = "{call sp_search_pay_by_pay_id(?)}";
         ResultSet rs = null;
-        Pay pay=null;
+        Pay pay = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.setLong(1, PayId);
             rs = ps.executeQuery();
             if (rs.next()) {
-                pay=this.getPayFromResultset(rs);
+                pay = this.getPayFromResultset(rs);
                 return pay;
                 //return this.getPayFromResultset(rs);
             } else {
@@ -374,7 +374,7 @@ public class PayBean implements Serializable {
             } catch (NullPointerException npe) {
                 pay.setCurrencyTypeName("");
             }
-            
+
             try {
                 pay.setExchangeRate(rs.getFloat("exchange_rate"));
             } catch (NullPointerException npe) {
@@ -808,6 +808,8 @@ public class PayBean implements Serializable {
         pay.setTransactionReasonId(0);
         pay.setStoreId(0);
         pay.setCurrencyTypeId(0);
+        pay.setSurcharge(0);
+        pay.setTotal_amount(0);
     }
 
     public void initClearPay(Pay pay, Transactor transactor) {
@@ -1189,7 +1191,7 @@ public class PayBean implements Serializable {
             ps.setString(2, aPayCategory);
             rs = ps.executeQuery();
             while (rs.next()) {
-                Pay pay=this.getPayFromResultset(rs);
+                Pay pay = this.getPayFromResultset(rs);
                 Pays.add(pay);
             }
         } catch (SQLException se) {
@@ -1342,5 +1344,30 @@ public class PayBean implements Serializable {
      */
     public void setSearchBy(String SearchBy) {
         this.SearchBy = SearchBy;
+    }
+
+    public void compute_surcharge_total_amount(long pay_method_id, Pay pay) {
+        String sql;
+        sql = "SELECT * FROM pay_method WHERE pay_method_id=" + pay_method_id + " limit 1";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                pay.setSurcharge((rs.getFloat("surcharge") * pay.getPaidAmount()) / 100);
+                pay.setTotal_amount(((rs.getFloat("surcharge") * pay.getPaidAmount()) / 100) + pay.getPaidAmount());
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
     }
 }
