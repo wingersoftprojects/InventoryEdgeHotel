@@ -185,6 +185,81 @@ public class Trans implements Serializable {
         }
     }
 
+    public void set_qty_edit(int aTransTypeNameId, Trans aTrans, List<TransItem> aActiveTransItems) {
+        if (getEndDate() != null && getStartDate() != null) {
+            for (TransItem item : aActiveTransItems) {
+                int days = Days.daysBetween(new LocalDate(getStartDate()), new LocalDate(getEndDate())).getDays();
+                if (days == 0) {
+                    item.setItemQty(1);
+                } else {
+                    item.setItemQty(Days.daysBetween(new LocalDate(getStartDate()), new LocalDate(getEndDate())).getDays());
+                }
+                //item.setAmount(item.getItemQty() * item.getUnitPrice());
+                editTransItem(aTransTypeNameId, aTrans, aActiveTransItems, item);
+            }
+        }
+    }
+    
+    public void editTransItem(int aTransTypeNameId, Trans aTrans, List<TransItem> aActiveTransItems, TransItem ti) {
+        if (ti.getItemQty() < 0) {
+            ti.setItemQty(0);
+        }
+        if (aTransTypeNameId == 2) {//SALE INVOICE
+            ti.setAmount(ti.getUnitPrice() * ti.getItemQty());
+            ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+            ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+        }
+        if (aTransTypeNameId == 10) {//SALE QUOTATION
+            ti.setAmount(ti.getUnitPrice() * ti.getItemQty());
+            ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+            ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+        }
+        if (aTransTypeNameId == 11) {//SALE ORDER
+            ti.setAmount(ti.getUnitPrice() * ti.getItemQty());
+            ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+            ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+        }
+        if (aTransTypeNameId == 12) {//GOODS DELIVERY
+            ti.setAmount(0);
+            ti.setAmountIncVat(0);
+            ti.setAmountExcVat(0);
+        }
+
+        if (aTransTypeNameId == 1) {//PURCHASE INVOICE
+            ti.setAmount(ti.getItemQty() * (ti.getUnitPrice() + ti.getUnitVat() - ti.getUnitTradeDiscount()));
+            ti.setAmountIncVat(ti.getAmount());
+            ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+        }
+        if (aTransTypeNameId == 8) {//PURCHASE ORDER
+            ti.setAmount(ti.getItemQty() * (ti.getUnitPrice() + ti.getUnitVat() - ti.getUnitTradeDiscount()));
+            ti.setAmountIncVat(ti.getAmount());
+            ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+        }
+        if (aTransTypeNameId == 9) {//GOODS RECEIVED
+            ti.setAmount(0);
+            ti.setAmountIncVat(0);
+            ti.setAmountExcVat(0);
+        }
+        if (aTransTypeNameId == 3) {//DISPOSE
+            aTrans.setCashDiscount(0);
+            ti.setAmount(ti.getUnitPrice() * ti.getItemQty());
+            ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+            ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+        }
+
+        //for profit margin
+        if ("SALE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
+            ti.setUnitCostPrice(ti.getUnitCostPrice());
+            ti.setUnitProfitMargin((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) - ti.getUnitCostPrice());
+        } else {
+            ti.setUnitCostPrice(0);
+            ti.setUnitProfitMargin(0);
+        }
+
+        //update totals
+        new TransBean().setTransTotalsAndUpdate(aTrans, aActiveTransItems);
+    }
+
     public void set_qty_group_checkin() {
         if (getEndDate() != null && getStartDate() != null) {
             int days = Days.daysBetween(new LocalDate(getStartDate()), new LocalDate(getEndDate())).getDays();

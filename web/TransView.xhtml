@@ -121,17 +121,16 @@
                 <h:outputLabel styleClass="clsLabel" value="#{transactionTypeBean.getTransactionType(trans.transactionTypeId).billTransactorLabel}"/>
                 <h:inputText styleClass="clsInput" id="itxtCustomerName2" disabled="true" value="#{transactorBean.getTransactor(trans.billTransactorId).transactorNames}"/>
 
-                <h:outputLabel styleClass="clsLabel" value="Scheme Transactor"/>
-                <h:inputText styleClass="clsInput" id="itxtCustomerName3" disabled="true" value="#{transactorBean.getTransactor(trans.schemeTransactorId).transactorNames}"/>
-                <h:outputLabel styleClass="clsLabel" value="Scheme Member"/>
-                <h:inputText styleClass="clsInput" id="itxtSchemeMember" disabled="true" value="#{trans.princSchemeMember}"/>
+
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 250px" value=""/>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 250px" value=""/>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 250px" value="Date Of Arrival"/>
                 <p:calendar styleClass="clsInput" id="calStartDate" pattern="dd-MM-yyyy" navigator="true" showButtonPanel="true" readonlyInput="true" size="12" value="#{trans.startDate}">
-                    <!--<p:ajax listener="#{trans.set_qty()}" process="@this,itxtQty,itxtAmount" event="dateSelect" update="itxtQty,itxtAmount"/>-->
+                    <p:ajax listener="#{trans.set_qty_edit(transactionType.transactionTypeId,trans,transItemBean.activeTransItems)}" process="@this" event="dateSelect" update="dtblTransItems"/>
                 </p:calendar>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 250px" value="Date Of Departure"/>
                 <p:calendar styleClass="clsInput" id="calEndDate" pattern="dd-MM-yyyy" navigator="true" showButtonPanel="true" readonlyInput="true" size="12" value="#{trans.endDate}">
-                    <!--<p:ajax listener="#{trans.set_qty()}" process="@this,itxtQty,itxtAmount" event="dateSelect" update="itxtQty,itxtAmount"/>-->
+                    <p:ajax listener="#{trans.set_qty_edit(transactionType.transactionTypeId,trans,transItemBean.activeTransItems)}" process="@this" event="dateSelect" update="dtblTransItems"/>
                 </p:calendar>
             </h:panelGrid>
 
@@ -228,6 +227,13 @@
                         <f:convertDateTime pattern="#{companySetting.getDateFormat()}" timeZone="#{companySetting.getTimeZone()}"/>
                     </h:outputLabel>
                 </p:column> 
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Currency</f:facet>
+                    <!-- row record -->
+                    #{currencyTypeBean.getCurrencyType(ati.currencyTypeId).currencyTypeName}
+                </p:column>
             </p:dataTable>
 
             <h:panelGrid id="pgrdTransTotals">
@@ -385,6 +391,12 @@
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
                 <h:messages id="msgsMainMessage" style="color: red"/><br/>
             </h:panelGrid>
+
+            <!--<h:outputLabel styleClass="clsLabel" value="Scheme Transactor"/>
+                <h:inputText styleClass="clsInput" id="itxtCustomerName3" disabled="true" value="#{transactorBean.getTransactor(trans.schemeTransactorId).transactorNames}"/>
+                <h:outputLabel styleClass="clsLabel" value="Scheme Member"/>
+                <h:inputText styleClass="clsInput" id="itxtSchemeMember" disabled="true" value="#{trans.princSchemeMember}"/>-->
+
         </h:form>
     </h:body>
 </html>

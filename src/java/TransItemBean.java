@@ -926,6 +926,11 @@ public class TransItemBean implements Serializable {
             } catch (NullPointerException | SQLException npe) {
                 transitem.setBillTransactorId(0);
             }
+            try {
+                transitem.setCurrencyTypeId(aResultSet.getInt("currency_type_id"));
+            } catch (NullPointerException | SQLException npe) {
+                transitem.setCurrencyTypeId(0);
+            }
             return transitem;
         } catch (SQLException se) {
             System.err.println(se.getMessage());
