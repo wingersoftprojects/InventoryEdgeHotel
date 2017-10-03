@@ -560,7 +560,8 @@ public class TransactorLedgerBean implements Serializable {
         }
         return this.ReportTransactorLedgerSummary;
     }
-    public List<TransactorLedger> getReportTransactorLedgerSummarySingleIndividual_Guest_Folio(long aBillTransactorId,long GuestFolioId) {
+
+    public List<TransactorLedger> getReportTransactorLedgerSummarySingleIndividual_Guest_Folio(long aBillTransactorId, long GuestFolioId) {
         String sql;
         sql = "{call sp_report_transactor_ledger_summary_single_individual_folio(?,?)}";
         ResultSet rs = null;
@@ -656,7 +657,7 @@ public class TransactorLedgerBean implements Serializable {
                         TmpTransactorLedgerRoomDetails.setEndDate(null);
                     }
                     try {
-                        TmpTransactorLedgerRoomDetails.setActualExitDate(rs.getDate("actual_exit_date"));
+                        TmpTransactorLedgerRoomDetails.setActualExitDate(new Date(rs.getTimestamp("actual_exit_date").getTime()));
                     } catch (NullPointerException ex) {
                         TmpTransactorLedgerRoomDetails.setActualExitDate(null);
                     }
@@ -683,7 +684,7 @@ public class TransactorLedgerBean implements Serializable {
         return this.ReportTransactorLedgerRoomDetails;
     }
 
-    public List<TransactorLedgerRoomDetails> getReportTransactorLedgerRoomDetails_Guest_Folio(TransactorLedger aTransactorLedger,long GuestFolioId) {
+    public List<TransactorLedgerRoomDetails> getReportTransactorLedgerRoomDetails_Guest_Folio(TransactorLedger aTransactorLedger, long GuestFolioId) {
         String sql;
         sql = "{call sp_report_transactor_ledger_summary_room_details_guest_folio(?,?,?,?)}";
         ResultSet rs = null;
@@ -729,7 +730,7 @@ public class TransactorLedgerBean implements Serializable {
                         TmpTransactorLedgerRoomDetails.setEndDate(null);
                     }
                     try {
-                        TmpTransactorLedgerRoomDetails.setActualExitDate(rs.getDate("actual_exit_date"));
+                        TmpTransactorLedgerRoomDetails.setActualExitDate(new Date(rs.getTimestamp("actual_exit_date").getTime()));
                     } catch (NullPointerException ex) {
                         TmpTransactorLedgerRoomDetails.setActualExitDate(null);
                     }
@@ -750,6 +751,72 @@ public class TransactorLedgerBean implements Serializable {
                     } catch (SQLException ex) {
                         System.err.println(ex.getMessage());
                     }
+                }
+            }
+        }
+        return this.ReportTransactorLedgerRoomDetails;
+    }
+
+    public List<TransactorLedgerRoomDetails> get_report_transactor_ledger_room_details_guest_folio_recent_check_outs() {
+        String sql;
+        sql = "SELECT t.transactor_names, r.room_number,ro.start_date,ro.end_date,ro.check_out_date AS actual_exit_date,CONCAT(ud.second_name,' ',ud.first_name) AS checked_out_by FROM room_occupancy ro \n"
+                + "INNER JOIN transactor t on t.transactor_id=ro.transactor_id\n"
+                + " LEFT JOIN user_detail ud on ro.check_out_user_detail_id=ud.user_detail_id\n"
+                + "LEFT JOIN room r on r.room_id=ro.room_id \n"
+                + "INNER JOIN `transaction` tr on tr.transaction_id=ro.transaction_id\n"
+                + "where DATEDIFF(now(), actual_exit_date)<=3\n"
+                + " order by ro.start_date desc;";
+        ResultSet rs = null;
+        this.ReportTransactorLedgerRoomDetails.clear();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            //System.out.println(rs.getStatement());
+            TransactorLedgerRoomDetails TmpTransactorLedgerRoomDetails;
+            while (rs.next()) {
+                TmpTransactorLedgerRoomDetails = new TransactorLedgerRoomDetails();
+                try {
+                    TmpTransactorLedgerRoomDetails.setTransactorName(rs.getString("transactor_names"));
+                } catch (NullPointerException ex) {
+                    TmpTransactorLedgerRoomDetails.setTransactorName("");
+                }
+                try {
+                    TmpTransactorLedgerRoomDetails.setRoomNumber(rs.getString("room_number"));
+                } catch (NullPointerException ex) {
+                    TmpTransactorLedgerRoomDetails.setRoomNumber("");
+                }
+                try {
+                    TmpTransactorLedgerRoomDetails.setStartDate(rs.getDate("start_date"));
+                } catch (NullPointerException ex) {
+                    TmpTransactorLedgerRoomDetails.setStartDate(null);
+                }
+                try {
+                    TmpTransactorLedgerRoomDetails.setEndDate(rs.getDate("end_date"));
+                } catch (NullPointerException ex) {
+                    TmpTransactorLedgerRoomDetails.setEndDate(null);
+                }
+                try {
+                    TmpTransactorLedgerRoomDetails.setActualExitDate(new Date(rs.getTimestamp("actual_exit_date").getTime()));
+                } catch (NullPointerException ex) {
+                    TmpTransactorLedgerRoomDetails.setActualExitDate(null);
+                }
+                try {
+                    TmpTransactorLedgerRoomDetails.setCheckedOutBy(rs.getString("checked_out_by"));
+                } catch (NullPointerException ex) {
+                    TmpTransactorLedgerRoomDetails.setCheckedOutBy("");
+                }
+                this.ReportTransactorLedgerRoomDetails.add(TmpTransactorLedgerRoomDetails);
+            }
+            //this.ActionMessage=((""));
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
                 }
             }
         }

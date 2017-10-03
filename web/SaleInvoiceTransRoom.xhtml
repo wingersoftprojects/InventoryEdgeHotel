@@ -38,7 +38,7 @@
                 <h:outputLabel style="background-color:black;color: lightsalmon;" value="Stock:Decreases"/>
                 <h:outputLabel style="background-color:black;color:lightsalmon;" value="Ledger:Debts sale,Credits payment"/>
             </h:panelGrid>
-            <h:panelGrid styleClass="clsGridMainMessages" columns="1" style="margin-left: 1110px; padding: 5px; position: fixed; background: #c2dfef;">
+            <h:panelGrid styleClass="clsGridMainMessages" columns="1" style="margin-left: 910px; padding: 5px; position: fixed; background: #c2dfef;">
                 <p:commandButton id="newfolio" value="New Folio" process="@this" update=":guestfolioform" oncomplete="PF('GuestFolioDialog').show();" rendered="#{transBean.isCreateFolio(generalUserSetting.getCurrentUser(),generalUserSetting.getCurrentGroupRights())}">
                 </p:commandButton>
                 <br/>

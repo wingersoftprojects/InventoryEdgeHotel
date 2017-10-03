@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -24,7 +25,7 @@ import javax.faces.context.FacesContext;
 @ManagedBean
 @SessionScoped
 public class GuestFolioBean implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     private List<GuestFolio> GuestFolios;
     private String ActionMessage = null;
@@ -34,25 +35,25 @@ public class GuestFolioBean implements Serializable {
     private GuestFolio SelectedSchemeGuestFolio;
     private List<GuestFolio> GuestFolioObjectList;
     private List<GuestFolio> ReportGuestFolios = new ArrayList<>();
-    
+
     List<GuestFolio> ReportGuestFolioSummary = new ArrayList<>();
-    
+
     public List<GuestFolio> getReportGuestFolios() {
         return ReportGuestFolios;
     }
-    
+
     public void setReportGuestFolios(List<GuestFolio> ReportGuestFolios) {
         this.ReportGuestFolios = ReportGuestFolios;
     }
-    
+
     public List<GuestFolio> getReportGuestFolioSummary() {
         return ReportGuestFolioSummary;
     }
-    
+
     public void setReportGuestFolioSummary(List<GuestFolio> ReportGuestFolioSummary) {
         this.ReportGuestFolioSummary = ReportGuestFolioSummary;
     }
-    
+
     public GuestFolio findGuestFolio(Long GuestFolioId) {
         String sql = "{call sp_search_guest_folio_by_id(?)}";
         ResultSet rs = null;
@@ -79,7 +80,7 @@ public class GuestFolioBean implements Serializable {
             }
         }
     }
-    
+
     public void saveGuestFolio(GuestFolio guest_folio) {
         String sql = null;
         String msg = "";
@@ -92,7 +93,7 @@ public class GuestFolioBean implements Serializable {
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
-        
+
         if (guest_folio.getTransactor() == null) {
             msg = "GUEST/COMPANY NOT SELECTED";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
@@ -108,11 +109,11 @@ public class GuestFolioBean implements Serializable {
         } else if ("GUESTFOLIO".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) && guest_folio.getGuestFolioId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "GUESTFOLIO", "Edit") == 0) {
             msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ((new CustomValidator().CheckRecords(sql2) > 0 && guest_folio.getGuestFolioId() == 0) || (guest_folio.getGuestFolioId() > 0)) {
+        } else if ((new CustomValidator().CheckRecords(sql2) > 0 && guest_folio.getGuestFolioId() == 0)) {
             msg = "An active Guest Folio for (" + guest_folio.getTransactor().getTransactorNames() + ") already exists!";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else {
-            
+
             if (guest_folio.getGuestFolioId() == 0) {
                 sql = "{call sp_insert_guest_folio(?,?,?,?,?,?)}";
             } else if (guest_folio.getGuestFolioId() > 0) {
@@ -145,12 +146,12 @@ public class GuestFolioBean implements Serializable {
                     } catch (NullPointerException npe) {
                         cs.setDate("in_adults", null);
                     }
-                    
+
                     cs.setInt("in_add_user_detail_id", new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     cs.executeUpdate();
                     this.setActionMessage("Saved Successfully");
                     this.clearGuestFolio(guest_folio);
-                    
+
                 } else if (guest_folio.getGuestFolioId() > 0) {
                     //IN in_guest_folio_id bigint,IN in_is_current varchar(1),IN in_status varchar(20) ,IN in_transactor_id bigint,IN in_start_date date,IN in_end_date date,IN in_edit_user_detail_id int
                     cs.setLong("in_guest_folio_id", guest_folio.getGuestFolioId());
@@ -167,7 +168,7 @@ public class GuestFolioBean implements Serializable {
                     } catch (NullPointerException npe) {
                         cs.setDate("in_end_date", null);
                     }
-                    
+
                     try {
                         cs.setInt("in_children", guest_folio.getChildren());
                     } catch (NullPointerException npe) {
@@ -178,7 +179,7 @@ public class GuestFolioBean implements Serializable {
                     } catch (NullPointerException npe) {
                         cs.setDate("in_adults", null);
                     }
-                    
+
                     cs.setInt("in_edit_user_detail_id", new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     cs.executeUpdate();
                     this.setActionMessage("Saved Successfully");
@@ -191,7 +192,7 @@ public class GuestFolioBean implements Serializable {
             }
         }
     }
-    
+
     public GuestFolio getGuestFolioFromResultSet(ResultSet rs) {
         GuestFolio guest_folio = new GuestFolio();
         try {
@@ -246,13 +247,13 @@ public class GuestFolioBean implements Serializable {
         }
         return guest_folio;
     }
-    
+
     private GuestFolio guestFolio;
 
     public GuestFolio getGuestFolio() {
         return guestFolio;
     }
-    
+
     public void setGuestFolio(GuestFolio guestFolio) {
         this.guestFolio = guestFolio;
     }
@@ -260,13 +261,13 @@ public class GuestFolioBean implements Serializable {
     public void set_guest_folio(long GuestFolioId) {
         this.guestFolio = getGuestFolio(GuestFolioId);
     }
-    
-    public void set_guest_folio_null(){
-        GuestFolio gf=new GuestFolio();
+
+    public void set_guest_folio_null() {
+        GuestFolio gf = new GuestFolio();
         gf.setGuestFolioId(0);
-        this.guestFolio=gf;
+        this.guestFolio = gf;
     }
-    
+
     public GuestFolio getGuestFolio(long GuestFolioId) {
         String sql = "{call sp_search_guest_folio_by_id(?)}";
         ResultSet rs = null;
@@ -292,21 +293,21 @@ public class GuestFolioBean implements Serializable {
                 }
             }
         }
-        
+
     }
-    
+
     public void deleteGuestFolio(GuestFolio guest_folio) {
         String sql = "DELETE FROM guest_folio WHERE guest_folio_id=?";
         String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
-        
+
         if ("GUESTFOLIO".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "CUSTOMER", "Delete") == 0) {
             msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else {
-            
+
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -320,7 +321,7 @@ public class GuestFolioBean implements Serializable {
             }
         }
     }
-    
+
     public void displayGuestFolio(GuestFolio GuestFolioFrom, GuestFolio GuestFolioTo) {
         GuestFolioTo.setGuestFolioId(GuestFolioFrom.getGuestFolioId());
         GuestFolioTo.setTransactorId(GuestFolioFrom.getTransactorId());
@@ -328,8 +329,11 @@ public class GuestFolioBean implements Serializable {
         GuestFolioTo.setEndDate(GuestFolioFrom.getEndDate());
         GuestFolioTo.setIsCurrent(GuestFolioFrom.getIsCurrent());
         GuestFolioTo.setStatus(GuestFolioFrom.getStatus());
+        GuestFolioTo.setAdults(GuestFolioFrom.getAdults());
+        GuestFolioTo.setChildren(GuestFolioFrom.getChildren());
+        GuestFolioTo.setTransactor(getTransactor(GuestFolioFrom.getTransactorId()));
     }
-    
+
     public void closeGuestFolio(GuestFolio GuestFolioFrom, GuestFolio GuestFolioTo) {
 //        GuestFolioTo.setGuestFolioId(GuestFolioFrom.getGuestFolioId());
 //        GuestFolioTo.setTransactorId(GuestFolioFrom.getTransactorId());
@@ -339,7 +343,7 @@ public class GuestFolioBean implements Serializable {
 //        GuestFolioTo.setStatus(GuestFolioFrom.getStatus());
 
         String sql = "{call sp_update_close_guest_folio(?,?)}";
-        
+
         try (Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
             cs.setLong(1, GuestFolioFrom.getGuestFolioId());
@@ -348,9 +352,9 @@ public class GuestFolioBean implements Serializable {
         } catch (SQLException se) {
             System.err.println(se.getMessage());
         }
-        
+
     }
-    
+
     public void clearGuestFolio(GuestFolio guest_folio) {
         if (guest_folio != null) {
             guest_folio.setGuestFolioId(0);
@@ -360,9 +364,11 @@ public class GuestFolioBean implements Serializable {
             guest_folio.setEndDate(null);
             guest_folio.setChildren(null);
             guest_folio.setAdults(null);
+            guest_folio.setTransactor(null);
         }
+        //guest_folio = new GuestFolio();
     }
-    
+
     public void initClearGuestFolio(GuestFolio guest_folio) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -374,15 +380,15 @@ public class GuestFolioBean implements Serializable {
             guest_folio.setEndDate(null);
         }
     }
-    
+
     public void clearSelectedGuestFolio() {
         this.clearGuestFolio(this.getSelectedGuestFolio());
     }
-    
+
     public void clearSelectedBillGuestFolio() {
         this.clearGuestFolio(this.getSelectedBillGuestFolio());
     }
-    
+
     public List<GuestFolio> getGuestFolios() {
         String sql;
         sql = "{call sp_search_guest_folio_by_name(?)}";
@@ -409,20 +415,22 @@ public class GuestFolioBean implements Serializable {
         }
         return GuestFolios;
     }
-    
-    public List<GuestFolio> getGuestFoliosByTransactor_Amounts(Transactor transactor, Transactor billOther) {
+
+    public List<GuestFolio> getGuestFoliosByTransactor_Amounts(long transactor, long billOther) {
         String sql;
         sql = "{call sp_report_current_guest_folio_summary_by_transactor(?)}";
         ResultSet rs = null;
         List<GuestFolio> NewGuestFolios = new ArrayList<GuestFolio>();
-        if (transactor != null || billOther != null) {
+        if (transactor != 0 || billOther != 0) {
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     PreparedStatement ps = conn.prepareStatement(sql);) {
-                if (billOther != null) {
-                    ps.setLong(1, billOther.getTransactorId());
+                if (billOther != 0) {
+                    ps.setLong(1, billOther);
+                } else if (transactor != 0 && billOther == 0) {
+                    ps.setLong(1, transactor);
                 } else {
-                    ps.setLong(1, transactor.getTransactorId());
+                    ps.setLong(1, 0);
                 }
                 rs = ps.executeQuery();
                 while (rs.next()) {
@@ -442,20 +450,30 @@ public class GuestFolioBean implements Serializable {
         }
         return NewGuestFolios;
     }
-    
-    public List<GuestFolio> getGuestFoliosByTransactor(Transactor transactor, Transactor billOther) {
+
+    public List<GuestFolio> getGuestFoliosByTransactor(long transactor, long billOther) {
         String sql;
         sql = "{call sp_search_guest_folio_by_transactor(?)}";
         ResultSet rs = null;
         List<GuestFolio> NewGuestFolios = new ArrayList<GuestFolio>();
-        if (transactor != null || billOther != null) {
+        if (transactor != 0 || billOther != 0) {
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     PreparedStatement ps = conn.prepareStatement(sql);) {
-                if (billOther != null) {
-                    ps.setLong(1, billOther.getTransactorId());
+                if (billOther != 0) {
+                    if (billOther != 0) {
+                        ps.setLong(1, billOther);
+                    } else if (transactor != 0) {
+                        ps.setLong(1, transactor);
+                    } else {
+                        ps.setLong(1, 0);
+                    }
                 } else {
-                    ps.setLong(1, transactor.getTransactorId());
+                    if (transactor != 0) {
+                        ps.setLong(1, transactor);
+                    } else {
+                        ps.setLong(1, 0);
+                    }
                 }
                 rs = ps.executeQuery();
                 while (rs.next()) {
@@ -475,7 +493,7 @@ public class GuestFolioBean implements Serializable {
         }
         return NewGuestFolios;
     }
-    
+
     public void setGuestFolios(List<GuestFolio> GuestFolios) {
         this.GuestFolios = GuestFolios;
     }
@@ -541,7 +559,7 @@ public class GuestFolioBean implements Serializable {
         }
         return GuestFolioObjectList;
     }
-    
+
     public List<GuestFolio> getReportGuestFolios(GuestFolio aGuestFolio, boolean RETRIEVE_REPORT) {
         String sql = "{call sp_report_guest_folio(?)}";
         ResultSet rs = null;
@@ -571,7 +589,7 @@ public class GuestFolioBean implements Serializable {
         }
         return this.ReportGuestFolios;
     }
-    
+
     public long getReportGuestFoliosCount() {
         return this.ReportGuestFolios.size();
     }
@@ -652,7 +670,7 @@ public class GuestFolioBean implements Serializable {
     public void setSelectedSchemeGuestFolio(GuestFolio SelectedSchemeGuestFolio) {
         this.SelectedSchemeGuestFolio = SelectedSchemeGuestFolio;
     }
-    
+
     public List<GuestFolio> getReportCurrentGuestFolioSummaryByTransactor(long aBillTransactorId) {
         String sql;
         sql = "{call sp_report_current_guest_folio_summary_by_transactor(?)}";
@@ -708,5 +726,183 @@ public class GuestFolioBean implements Serializable {
             }
         }
         return this.ReportGuestFolioSummary;
+    }
+
+    public Transactor getTransactor(long TransactorId) {
+        String sql = "{call sp_search_transactor_by_id(?)}";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, TransactorId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return this.getTransactorFromResultSet(rs);
+            } else {
+                return null;
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+            return null;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+
+    }
+
+    public Transactor getTransactorFromResultSet(ResultSet rs) {
+        try {
+            Transactor transactor = new Transactor();
+            try {
+                transactor.setTransactorId(rs.getLong("transactor_id"));
+            } catch (NullPointerException npe) {
+                transactor.setTransactorId(0);
+            }
+            try {
+                transactor.setTransactorType(rs.getString("transactor_type"));
+            } catch (NullPointerException npe) {
+                transactor.setTransactorType("");
+            }
+            try {
+                transactor.setTransactorNames(rs.getString("transactor_names"));
+            } catch (NullPointerException npe) {
+                transactor.setTransactorNames("");
+            }
+            try {
+                transactor.setPhone(rs.getString("phone"));
+            } catch (NullPointerException npe) {
+                transactor.setPhone("");
+            }
+            try {
+                transactor.setEmail(rs.getString("email"));
+            } catch (NullPointerException npe) {
+                transactor.setEmail("");
+            }
+            try {
+                transactor.setWebsite(rs.getString("website"));
+            } catch (NullPointerException npe) {
+                transactor.setWebsite("");
+            }
+            try {
+                transactor.setCpName(rs.getString("cpname"));
+            } catch (NullPointerException npe) {
+                transactor.setCpName("");
+            }
+            try {
+                transactor.setCpTitle(rs.getString("cptitle"));
+            } catch (NullPointerException npe) {
+                transactor.setCpTitle("");
+            }
+            try {
+                transactor.setCpPhone(rs.getString("cpphone"));
+            } catch (NullPointerException npe) {
+                transactor.setCpPhone("");
+            }
+            try {
+                transactor.setCpEmail(rs.getString("cpemail"));
+            } catch (NullPointerException npe) {
+                transactor.setCpEmail("");
+            }
+            try {
+                transactor.setPhysicalAddress(rs.getString("physical_address"));
+            } catch (NullPointerException npe) {
+                transactor.setPhysicalAddress("");
+            }
+            try {
+                transactor.setTaxIdentity(rs.getString("tax_identity"));
+            } catch (NullPointerException npe) {
+                transactor.setTaxIdentity("");
+            }
+            try {
+                transactor.setAccountDetails(rs.getString("account_details"));
+            } catch (NullPointerException npe) {
+                transactor.setAccountDetails("");
+            }
+            try {
+                transactor.setCardNumber(rs.getString("card_number"));
+            } catch (NullPointerException npe) {
+                transactor.setCardNumber("");
+            }
+            try {
+                transactor.setDOB(new Date(rs.getDate("dob").getTime()));
+            } catch (NullPointerException npe) {
+                transactor.setDOB(null);
+            }
+            try {
+                transactor.setIsSuspended(rs.getString("is_suspended"));
+            } catch (NullPointerException npe) {
+                transactor.setIsSuspended("");
+            }
+            try {
+                transactor.setSuspendedReason(rs.getString("suspended_reason"));
+            } catch (NullPointerException npe) {
+                transactor.setSuspendedReason("");
+            }
+            try {
+                transactor.setCategory(rs.getString("category"));
+            } catch (NullPointerException npe) {
+                transactor.setCategory("");
+            }
+            try {
+                transactor.setSex(rs.getString("sex"));
+            } catch (NullPointerException npe) {
+                transactor.setSex("");
+            }
+            try {
+                transactor.setOccupation(rs.getString("occupation"));
+            } catch (NullPointerException npe) {
+                transactor.setOccupation("");
+            }
+            try {
+                transactor.setLocCountry(rs.getString("loc_country"));
+            } catch (NullPointerException npe) {
+                transactor.setLocCountry("");
+            }
+            try {
+                transactor.setLocDistrict(rs.getString("loc_district"));
+            } catch (NullPointerException npe) {
+                transactor.setLocDistrict("");
+            }
+            try {
+                transactor.setLocTown(rs.getString("loc_town"));
+            } catch (NullPointerException npe) {
+                transactor.setLocTown("");
+            }
+            try {
+                transactor.setFirstDate(new Date(rs.getDate("first_date").getTime()));
+            } catch (NullPointerException npe) {
+                transactor.setFirstDate(null);
+            }
+
+            try {
+                transactor.setFileReference(rs.getString("file_reference"));
+            } catch (NullPointerException npe) {
+                transactor.setFileReference("");
+            }
+            try {
+                transactor.setIdType(rs.getString("id_type"));
+            } catch (NullPointerException npe) {
+                transactor.setIdType("");
+            }
+            try {
+                transactor.setIdNumber(rs.getString("id_number"));
+            } catch (NullPointerException npe) {
+                transactor.setIdNumber("");
+            }
+            try {
+                transactor.setIdExpiryDate(new Date(rs.getDate("id_expiry_date").getTime()));
+            } catch (NullPointerException npe) {
+                transactor.setIdExpiryDate(null);
+            }
+            return transactor;
+        } catch (SQLException se) {
+            return null;
+        }
     }
 }

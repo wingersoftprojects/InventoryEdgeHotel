@@ -7,7 +7,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
     <ui:composition>
-        <p:dataTable tableStyle="width:auto;" id="tblGuestFolioSummary" var="rtss" value="#{guestFolioBean.getGuestFoliosByTransactor_Amounts(transactorBean.selectedTransactor,transactorBean.selectedBillTransactor)}">
+        <p:dataTable tableStyle="width:auto;" id="tblGuestFolioSummary" var="rtss" value="#{guestFolioBean.getGuestFoliosByTransactor_Amounts(trans.transactorId,trans.billTransactorId)}">
             <f:facet name="header">
                 Current Guest Folio Summary Report
             </f:facet>

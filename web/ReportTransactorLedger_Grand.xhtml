@@ -41,21 +41,19 @@
                                 itemLabel="#{trct.transactorNames}" 
                                 itemValue="#{trct}" 
                                 converter="TransactorConverter" style="text-align: left" 
-                                forceSelection="true" required="true"
-                                >
+                                forceSelection="true" queryDelay="3">
                     <p:column headerText="Transactor Names" style="text-align: left" >  
                         #{trct.transactorNames} 
                     </p:column> 
                     <p:column headerText="Contact Person" style="text-align: left">  
                         #{trct.cpName} 
                     </p:column> 
-                    <p:ajax event="itemSelect" listener="#{transactorLedger.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}" update="menuGuestFolio,FolioDetails" process="@this,menuGuestFolio"/>
-                    <p:ajax event="change" listener="#{transactorLedger.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null}" update="menuGuestFolio,FolioDetails" process="@this,menuGuestFolio"/>
-                    <p:ajax event="itemSelect" listener="#{guestFolioBean.set_guest_folio_null()}" update="@form"/>
-                    <p:ajax event="change" listener="#{guestFolioBean.set_guest_folio_null()}" update="@form"/>
-                </p:autoComplete>
+                    <p:ajax event="itemSelect" listener="#{transactorLedger.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}"/>
+                    <p:ajax event="change" listener="#{transactorLedger.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null}"/>
+                    <p:ajax event="blur" listener="#{guestFolioBean.set_guest_folio_null()}" update="vTransactionGrid,menuGuestFolio" process="@this"/>
+                                    </p:autoComplete>
 
-                <p:outputLabel styleClass="clsLabelReportFilter" id="id22" value="Folio:"/>
+                <p:outputLabel styleClass="clsLabelReportFilter" id="id22" value="Folio Date(s):"/>
                 <p:selectOneMenu styleClass="clsInputReportFilter" id="menuGuestFolio" value="#{transactorLedger.guestFolioId}" >
                     <f:selectItem itemLabel="--Select--" itemValue=""/>
                     <f:selectItems value="#{transactorBean.guestFolios}" var="tst" itemLabel="#{tst.startDate} to #{tst.endDate} - #{tst.transactorName}" itemValue="#{tst.guestFolioId}"/>
@@ -276,7 +274,7 @@
 
                     <p:column headerText="Date Checked Out From System">
                         <h:outputText value="#{rtlrd.actualExitDate}">
-                            <f:convertDateTime pattern="#{companySetting.getDateFormat()} H:mm" timeZone="#{companySetting.getTimeZone()}"/>
+                            <f:convertDateTime pattern="#{companySetting.getDateFormat()} HH:mm:ss" timeZone="#{companySetting.getTimeZone()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="Checked Out By">

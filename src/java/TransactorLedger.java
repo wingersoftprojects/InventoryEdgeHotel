@@ -2,6 +2,7 @@
 import java.io.Serializable;
 import java.util.Date;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 
 /*
@@ -462,11 +463,23 @@ public class TransactorLedger implements Serializable {
         return BillTransactorId;
     }
 
+    @ManagedProperty(value = "#{guestFolioBean}")
+    private GuestFolioBean guestFolioBean;
+
+    public GuestFolioBean getGuestFolioBean() {
+        return guestFolioBean;
+    }
+
+    public void setGuestFolioBean(GuestFolioBean guestFolioBean) {
+        this.guestFolioBean = guestFolioBean;
+    }
+
     /**
      * @param BillTransactorId the BillTransactorId to set
      */
     public void setBillTransactorId(long BillTransactorId) {
         this.BillTransactorId = BillTransactorId;
+        //guestFolioBean.set_guest_folio_null();
     }
 
     /**

@@ -24,6 +24,25 @@
                     <p:calendar styleClass="clsInput" navigator="true" showButtonPanel="true" value="#{guestFolio.startDate}" pattern="#{companySetting.getDateFormat()}"/>
                     <h:outputLabel styleClass="clsLabel" value="End Date:"/>
                     <p:calendar styleClass="clsInput" navigator="true" showButtonPanel="true" value="#{guestFolio.endDate}" pattern="#{companySetting.getDateFormat()}"/>
+                    <h:outputLabel styleClass="clsLabel" value="Guest/Client:"/>
+                    <p:autoComplete id="autcTransactorGuest" value="#{guestFolio.transactor}" 
+                                    completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                    var="trct" 
+                                    itemLabel="#{trct.transactorNames}" 
+                                    itemValue="#{trct}" 
+                                    converter="TransactorConverter" style="text-align: left" 
+                                    forceSelection="true" queryDelay="0"  size="10" required="true" requiredMessage="Guest/Company is required!"
+                                    >
+                        <p:column headerText="Transactor Names" style="text-align: left" >  
+                            #{trct.transactorNames} 
+                        </p:column> 
+                        <p:column headerText="Type" style="text-align: left" >  
+                            #{trct.transactorType} 
+                        </p:column> 
+                        <p:column headerText="Contact Person" style="text-align: left">  
+                            #{trct.cpName} 
+                        </p:column> 
+                    </p:autoComplete>
                 </h:panelGrid>
 
                 <h:panelGrid styleClass="clsGridMainCommands" columns="1">
@@ -32,10 +51,10 @@
                             <f:ajax listener="#{guestFolioBean.saveGuestFolio(guestFolio)}" execute="@form" render="@form" />
                         </h:commandButton>
                         <h:commandButton styleClass="clsButtonBig" id="cmdbClear" value="CLEAR (ALT+C)" accesskey="c">
-                            <f:ajax listener="#{guestFolioBean.clearGuestFolio(guestFolio)}" execute="@form" render="@form" />
+                            <f:ajax listener="#{guestFolioBean.clearGuestFolio(guestFolio)}" execute="@this" render="@form" />
                         </h:commandButton>
                         <h:commandButton styleClass="clsButtonBig" id="cmdbDelete" value="DELETE (ALT+D)" onclick="return confirmDelete();" accesskey="d">
-                            <f:ajax listener="#{guestFolioBean.deleteGuestFolio(guestFolio)}" execute="@form" render="@form" />
+                            <f:ajax listener="#{guestFolioBean.deleteGuestFolio(guestFolio)}" execute="@this" render="@form" />
                         </h:commandButton>
                     </h:panelGrid>
                 </h:panelGrid>
@@ -49,7 +68,7 @@
                     <h:outputLabel id="olblMainSearch" value="Search Guest/Company"/>
                     <h:outputLabel id="olblMainSearchDesc" value="(Type Guest/Company Name)"/>
                     <p:outputPanel>
-                        <p:autoComplete id="autcTransactor" value="#{guestFolio.transactor}" 
+                        <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
                                         completeMethod="#{transactorBean.getTransactorObjectList}" 
                                         var="trct" 
                                         itemLabel="#{trct.transactorNames}" 
@@ -76,8 +95,7 @@
                     </p:outputPanel>
                 </h:panelGrid>
 
-                <p:dataTable tableStyle="width:auto;" id="dtblGuestFolio" value="#{guestFolioBean.getGuestFoliosByTransactor(guestFolio.transactor,transactorBean.selectedBillTransactor)}" var="t" 
-                             > 
+                <p:dataTable tableStyle="width:auto;" id="dtblGuestFolio" value="#{guestFolioBean.getGuestFoliosByTransactor(trans.transactorId,trans.billTransactorId)}" var="t" > 
                     <p:column>
                         <!-- column header -->
                         <f:facet name="header">Adults</f:facet>
@@ -131,11 +149,11 @@
                         <f:facet name="header">Action</f:facet>
                         <!-- row record -->
                         <h:commandLink value="Edit">
-                            <f:ajax listener="#{guestFolioBean.displayGuestFolio(t,guestFolio)}" execute="@form" render="@form"/>
+                            <f:ajax listener="#{guestFolioBean.displayGuestFolio(t,guestFolio)}" execute="@this" render="@form"/>
                         </h:commandLink>
                         &nbsp;
                         <p:commandLink value="Close" rendered="#{t.status!='Closed'}">
-                            <f:ajax listener="#{guestFolioBean.closeGuestFolio(t,guestFolio)}" execute="@form" render="@form"/>
+                            <f:ajax listener="#{guestFolioBean.closeGuestFolio(t,guestFolio)}" execute="@this" render="@form"/>
                             <p:confirm header="Confirmation" message="Are you sure you want to close this folio?" icon="ui-icon-alert" />
                         </p:commandLink>
                         &nbsp;

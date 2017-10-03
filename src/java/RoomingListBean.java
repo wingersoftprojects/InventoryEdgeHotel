@@ -95,6 +95,9 @@ public class RoomingListBean {
             }
         }
     }
+    
+    
+    
 
     public List<RoomingList> getRoomingList() {
         //if (roomingList == null || roomingList.size()==0) {

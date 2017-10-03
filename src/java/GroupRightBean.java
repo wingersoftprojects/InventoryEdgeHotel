@@ -663,7 +663,7 @@ public class GroupRightBean implements Serializable {
      * @return the FunctionArrayList
      */
     public String[] getFunctionArrayList() {
-        int n = 27;
+        int n = 28;
         FunctionArrayList = new String[n];
         FunctionArrayList[0] = "ITEM";
         FunctionArrayList[1] = "SALE QUOTATION";
