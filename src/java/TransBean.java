@@ -915,7 +915,7 @@ public class TransBean implements Serializable {
 
             //update trans
             if (isTransCopySuccess && isTransItemCopySuccess && isTransItemReverseSuccess) {
-                String newSQL = "{call sp_update_transaction2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+                String newSQL = "{call sp_update_transaction2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
                 try (
                         Connection conn = DBConnection.getMySQLConnection();
                         CallableStatement cs = conn.prepareCall(newSQL);) {
@@ -944,6 +944,7 @@ public class TransBean implements Serializable {
                     } catch (Exception ex) {
                         cs.setDate("in_end_date", null);
                     }
+                    cs.setInt("in_number_of_persons", aNewTrans.getNumberOfPersons());
                     cs.executeUpdate();
                     isTransUpdateSuccess = true;
                 } catch (SQLException se) {
@@ -1875,7 +1876,11 @@ public class TransBean implements Serializable {
             } catch (NullPointerException | SQLException npe) {
                 trans.setExpiryDate(null);
             }
-
+            try {
+                trans.setNumberOfPersons(aResultSet.getInt("number_of_persons"));
+            } catch (NullPointerException | SQLException npe) {
+                trans.setNumberOfPersons(0);
+            }
             //return trans;
         } catch (SQLException se) {
             System.err.println(se.getMessage());

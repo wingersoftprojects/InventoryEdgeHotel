@@ -38,6 +38,10 @@
                 <h:outputLabel style="background-color:black;color: lightsalmon;" value="Stock:No effect"/>
                 <h:outputLabel style="background-color:black;color:lightsalmon;" value="Ledger:No effect"/>
             </h:panelGrid>
+            <h:panelGrid styleClass="clsGridMainMessages" columns="1" style="margin-left: 910px; padding: 5px; position: fixed; background: #c2dfef;">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
             <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
                 <h:outputLabel styleClass="clsLabel" value="Trans.Reason:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuTransactionReason" value="#{trans.transactionReasonId}">
@@ -67,6 +71,10 @@
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 250px" value="Date Of Departure"/>
                 <p:calendar styleClass="clsInput" id="calEndDate" pattern="dd-MM-yyyy" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.endDate}">
                 </p:calendar>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 170px" value="PAX"/>
+                <h:inputText styleClass="clsInput" value="#{trans.numberOfPersons}" size="10">
+                    <f:ajax execute="@this" event="blur"/>
+                </h:inputText>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 170px" value="Room Number"/>
                 <p:outputPanel>
                     <p:autoComplete id="autcRoom" widgetVar="WautcRoom" value="#{trans.selectedRoom}"  
@@ -318,7 +326,6 @@
             <h:panelGrid id="pgrdTermsConditions" styleClass="clsGridMainInput" columns="4">
                 <h:outputLabel styleClass="clsLabelTransItem" value="Reserved By"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="#{transactionTypeBean.getTransactionType(14).transactionUserLabel}"/>
-                <h:outputLabel styleClass="clsLabelTransItem" value="Number Of Persons"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="Expiry.Date"/>
                 <h:inputText styleClass="clsInput" value="#{trans.reservedBy}">
                 </h:inputText>
@@ -339,7 +346,6 @@
                     <p:ajax event="itemSelect" listener="#{trans.setTransactionUserDetailId(userDetailBean.selectedUserDetail.userDetailId)}"/>
                     <p:ajax event="change" listener="#{trans.setTransactionUserDetailId(userDetailBean.selectedUserDetail.userDetailId)}" rendered="#{userDetailBean.selectedUserDetail!=null}"/>
                 </p:autoComplete>
-                <h:inputText styleClass="clsInput" value="#{trans.numberOfPersons}"/>
                 <p:calendar styleClass="clsInput" id="calExpiredDate" pattern="#{companySetting.getDateFormat()}" timeZone="#{companySetting.getTimeZone()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.expiryDate}"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="Other Details"/>
                 <h:inputTextarea styleClass="clsInput" id="itxaTermsConditions" rows="4" value="#{trans.termsConditions}"/>
@@ -373,10 +379,10 @@
                 </h:panelGrid>
             </h:panelGrid>
 
-            <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+            <!--<h:panelGrid styleClass="clsGridMainMessages" columns="1">
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
                 <h:messages id="msgsMainMessage" style="color: red"/><br/>
-            </h:panelGrid>
+            </h:panelGrid>-->
 
             <!-- INVOICE STARTS HERE -->
             <ui:include src="TransactionViewR.xhtml"/>

@@ -122,8 +122,10 @@
                 <h:inputText styleClass="clsInput" id="itxtCustomerName2" disabled="true" value="#{transactorBean.getTransactor(trans.billTransactorId).transactorNames}"/>
 
 
-                <h:outputLabel styleClass="clsLabelTransItem" style="width: 250px" value=""/>
-                <h:outputLabel styleClass="clsLabelTransItem" style="width: 250px" value=""/>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 170px" value="PAX"/>
+                <h:inputText styleClass="clsInput" value="#{trans.numberOfPersons}" size="10">
+                    <f:ajax execute="@this" event="blur"/>
+                </h:inputText>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 250px" value="Date Of Arrival"/>
                 <p:calendar styleClass="clsInput" id="calStartDate" pattern="dd-MM-yyyy" navigator="true" showButtonPanel="true" readonlyInput="true" size="12" value="#{trans.startDate}">
                     <p:ajax listener="#{trans.set_qty_edit(transactionType.transactionTypeId,trans,transItemBean.activeTransItems)}" process="@this" event="dateSelect" update="dtblTransItems"/>
